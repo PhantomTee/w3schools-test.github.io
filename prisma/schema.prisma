@@ -1,0 +1,197 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String    @id @default(cuid())
+  walletAddress   String    @unique
+  xUserId         String?   @unique
+  xUsername       String?
+  xConnectedAt    DateTime?
+  xAccessToken    String?   // encrypted at application layer
+  xRefreshToken   String?   // encrypted at application layer
+  xTokenExpiresAt DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  markets  Market[]
+  bets     Bet[]
+  disputes Dispute[]
+
+  @@index([walletAddress])
+  @@index([xUserId])
+}
+
+model TweetSnapshot {
+  id              String   @id @default(cuid())
+  xUserId         String
+  tweetId         String
+  text            String
+  createdAtOnX    DateTime
+  fetchedAt       DateTime @default(now())
+  authorId        String
+  metricsJson     Json     @default("{}")
+  publicMetrics   Json     @default("{}")
+  eligible        Boolean  @default(false)
+  eligibilityNote String?
+  lang            String?
+  possiblySensitive Boolean @default(false)
+
+  markets Market[]
+
+  @@unique([tweetId, fetchedAt])
+  @@index([tweetId])
+  @@index([xUserId])
+}
+
+enum MarketState {
+  OPEN
+  LOCKED
+  RESOLVED
+  VOIDED
+  CANCELLED
+}
+
+enum MetricType {
+  FINAL_VIEWS
+  FINAL_LIKES
+  FINAL_REPOSTS
+  FINAL_REPLIES
+}
+
+model Market {
+  id                  String      @id @default(cuid())
+  chainMarketId       String?
+  contractAddress     String?
+  creatorWallet       String
+  xUserIdHash         String
+  tweetId             String
+  tweetSnapshotId     String?
+  metricType          MetricType  @default(FINAL_VIEWS)
+  startValue          BigInt
+  finalValue          BigInt?
+  durationHours       Int
+  createdAt           DateTime    @default(now())
+  expiresAt           DateTime
+  state               MarketState @default(OPEN)
+  rangesJson          Json
+  genLayerRequestJson Json?
+  genLayerResponseJson Json?
+  genLayerReportHash  String?
+  creationTxHash      String?
+  resolutionTxHash    String?
+  evidenceHash        String?
+  winningRangeIndex   Int?
+  protocolFeeBps      Int         @default(100)
+  totalStaked         BigInt      @default(0)
+
+  creator      User           @relation(fields: [creatorWallet], references: [walletAddress])
+  tweetSnapshot TweetSnapshot? @relation(fields: [tweetSnapshotId], references: [id])
+  bets         Bet[]
+  resolutions  ResolutionAttempt[]
+  disputes     Dispute[]
+
+  @@index([tweetId])
+  @@index([creatorWallet])
+  @@index([state])
+  @@index([expiresAt])
+  @@index([contractAddress])
+}
+
+model Bet {
+  id            String   @id @default(cuid())
+  marketId      String
+  walletAddress String
+  rangeIndex    Int
+  amount        BigInt
+  txHash        String?
+  createdAt     DateTime @default(now())
+  claimed       Boolean  @default(false)
+  claimTxHash   String?
+
+  market Market @relation(fields: [marketId], references: [id])
+  user   User   @relation(fields: [walletAddress], references: [walletAddress])
+
+  @@index([marketId])
+  @@index([walletAddress])
+  @@index([txHash])
+}
+
+enum ResolutionSource {
+  X_API
+  GENLAYER
+  MANUAL_ADMIN
+}
+
+enum ResolutionStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  VOIDED
+}
+
+model ResolutionAttempt {
+  id                String           @id @default(cuid())
+  marketId          String
+  source            ResolutionSource
+  status            ResolutionStatus @default(PENDING)
+  finalValue        BigInt?
+  winningRangeIndex Int?
+  evidenceJson      Json?
+  error             String?
+  createdAt         DateTime         @default(now())
+
+  market Market @relation(fields: [marketId], references: [id])
+
+  @@index([marketId])
+}
+
+enum DisputeStatus {
+  OPEN
+  UNDER_REVIEW
+  RESOLVED
+  REJECTED
+}
+
+model Dispute {
+  id                 String        @id @default(cuid())
+  marketId           String
+  raisedByWallet     String
+  reason             String
+  status             DisputeStatus @default(OPEN)
+  genLayerResultJson Json?
+  createdAt          DateTime      @default(now())
+  resolvedAt         DateTime?
+
+  market       Market @relation(fields: [marketId], references: [id])
+  raisedBy     User   @relation(fields: [raisedByWallet], references: [walletAddress])
+
+  @@index([marketId])
+}
+
+model OAuthNonce {
+  id          String   @id @default(cuid())
+  walletAddress String
+  nonce       String   @unique
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+
+  @@index([walletAddress])
+  @@index([nonce])
+}
+
+model XOAuthState {
+  id            String   @id @default(cuid())
+  walletAddress String
+  state         String   @unique
+  codeVerifier  String
+  expiresAt     DateTime
+  createdAt     DateTime @default(now())
+
+  @@index([state])
+}
