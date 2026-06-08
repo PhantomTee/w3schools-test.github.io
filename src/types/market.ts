@@ -27,6 +27,7 @@ export interface Market {
   genLayerReportHash: string | null
   creationTxHash: string | null
   resolutionTxHash: string | null
+  evidenceHash: string | null
   winningRangeIndex: number | null
   protocolFeeBps: number
   totalStaked: string

@@ -1,12 +1,11 @@
 'use client'
-import { useEffect } from 'react'
+import { Suspense, useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useSearchParams } from 'next/navigation'
-import Link from 'next/link'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { TweetCard } from '@/components/tweets/TweetCard'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -14,8 +13,43 @@ import {
 } from 'lucide-react'
 import { shortenAddress } from '@/lib/utils'
 
+// Isolated component so useSearchParams is inside a Suspense boundary
+function ProfileNotifications() {
+  const searchParams = useSearchParams()
+  const connected    = searchParams.get('connected')
+  const error        = searchParams.get('error')
+  const qc           = useQueryClient()
+
+  useEffect(() => {
+    if (connected) qc.invalidateQueries({ queryKey: ['me'] })
+  }, [connected, qc])
+
+  if (!connected && !error) return null
+
+  return (
+    <>
+      {connected && (
+        <div className="flex items-center gap-2 p-3 rounded-lg bg-emerald-900/30 text-emerald-400 text-sm">
+          <CheckCircle2 className="h-4 w-4" /> X account connected successfully!
+        </div>
+      )}
+      {error && (
+        <div className="flex items-center gap-2 p-3 rounded-lg bg-red-900/30 text-red-400 text-sm">
+          <AlertCircle className="h-4 w-4" />
+          {error === 'x_denied'            ? 'X authorization was denied.' :
+           error === 'x_already_connected' ? 'This X account is already connected to another wallet.' :
+           `Error: ${error}`}
+        </div>
+      )}
+    </>
+  )
+}
+
 export default function ProfilePage() {
-  const { data: meData }  = useQuery({ queryKey: ['me'], queryFn: () => fetch('/api/auth/me').then(r => r.json()) })
+  const { data: meData } = useQuery({
+    queryKey: ['me'],
+    queryFn:  () => fetch('/api/auth/me').then(r => r.json()),
+  })
   const me = meData?.user
 
   const { data: tweetsData, isLoading: tweetsLoading, refetch } = useQuery({
@@ -24,15 +58,6 @@ export default function ProfilePage() {
     enabled:   !!me?.xUserId,
     staleTime: 60_000,
   })
-
-  const searchParams = useSearchParams()
-  const connected = searchParams.get('connected')
-  const error     = searchParams.get('error')
-  const qc        = useQueryClient()
-
-  useEffect(() => {
-    if (connected) qc.invalidateQueries({ queryKey: ['me'] })
-  }, [connected, qc])
 
   if (!me) {
     return (
@@ -54,20 +79,11 @@ export default function ProfilePage() {
     <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-1 container mx-auto max-w-4xl px-4 py-8 space-y-8">
-        {/* Notifications */}
-        {connected && (
-          <div className="flex items-center gap-2 p-3 rounded-lg bg-emerald-900/30 text-emerald-400 text-sm">
-            <CheckCircle2 className="h-4 w-4" /> X account connected successfully!
-          </div>
-        )}
-        {error && (
-          <div className="flex items-center gap-2 p-3 rounded-lg bg-red-900/30 text-red-400 text-sm">
-            <AlertCircle className="h-4 w-4" />
-            {error === 'x_denied' ? 'X authorization was denied.' :
-             error === 'x_already_connected' ? 'This X account is already connected to another wallet.' :
-             `Error: ${error}`}
-          </div>
-        )}
+
+        {/* Search-params notifications — must be inside Suspense */}
+        <Suspense fallback={null}>
+          <ProfileNotifications />
+        </Suspense>
 
         {/* Profile card */}
         <Card className="gradient-border">
@@ -102,7 +118,10 @@ export default function ProfilePage() {
                 )}
               </div>
               <div className="text-right">
-                <div className="text-2xl font-bold">{me.marketsCreatedToday}<span className="text-sm font-normal text-muted-foreground">/10</span></div>
+                <div className="text-2xl font-bold">
+                  {me.marketsCreatedToday}
+                  <span className="text-sm font-normal text-muted-foreground">/10</span>
+                </div>
                 <div className="text-xs text-muted-foreground">markets today</div>
                 <div className="text-xs text-muted-foreground mt-1">{me.totalMarketsCreated} total created</div>
               </div>
