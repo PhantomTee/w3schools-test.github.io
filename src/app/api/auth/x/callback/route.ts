@@ -75,8 +75,6 @@ export async function GET(req: NextRequest) {
       xAccessToken:    encrypt(tokens.accessToken),
       xRefreshToken:   encrypt(tokens.refreshToken),
       xTokenExpiresAt: tokens.expiresAt,
-      xAvatarUrl:      xUser.avatarUrl    ?? null,
-      xFollowerCount:  xUser.followerCount ?? null,
     },
   })
 

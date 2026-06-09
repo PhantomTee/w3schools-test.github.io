@@ -10,8 +10,6 @@ export interface UserProfile {
   xUserId:             string | null
   xUsername:           string | null
   xConnectedAt:        string | null
-  xAvatarUrl:          string | null
-  xFollowerCount:      number | null
   marketsCreatedToday: number
   totalMarketsCreated: number
 }

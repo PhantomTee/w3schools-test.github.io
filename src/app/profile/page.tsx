@@ -40,31 +40,13 @@ export default function ProfilePage() {
         {/* Profile header */}
         <div className="bg-[var(--bg-elevated)] rounded-[20px] p-5 border border-[var(--border-soft)] mb-3">
           <div className="flex items-start justify-between mb-3">
-            <div className="flex items-center gap-3">
-              {user?.xAvatarUrl ? (
-                <img
-                  src={user.xAvatarUrl}
-                  alt="X avatar"
-                  className="h-12 w-12 rounded-full object-cover border border-[var(--border-soft)] shrink-0"
-                />
-              ) : (
-                <span className="h-12 w-12 rounded-full bg-[var(--bg-muted)] border border-[var(--border-soft)] shrink-0 flex items-center justify-center text-[20px] text-[var(--text-muted)]">
-                  {user?.xUsername ? user.xUsername[0].toUpperCase() : '?'}
-                </span>
+            <div>
+              <p className="text-[20px] font-semibold text-[var(--text-primary)]">
+                {user?.xUsername ? `@${user.xUsername}` : 'No X connected'}
+              </p>
+              {address && (
+                <p className="text-[12px] text-[var(--text-muted)] font-mono mt-0.5">{truncateAddr(address)}</p>
               )}
-              <div>
-                <p className="text-[20px] font-semibold text-[var(--text-primary)]">
-                  {user?.xUsername ? `@${user.xUsername}` : 'No X connected'}
-                </p>
-                {address && (
-                  <p className="text-[12px] text-[var(--text-muted)] font-mono mt-0.5">{truncateAddr(address)}</p>
-                )}
-                {user?.xFollowerCount != null && (
-                  <p className="text-[11px] text-[var(--text-muted)] mt-0.5 tabular-nums">
-                    {user.xFollowerCount.toLocaleString()} followers
-                  </p>
-                )}
-              </div>
             </div>
 
             <div className="flex items-center gap-1.5 mt-1">
