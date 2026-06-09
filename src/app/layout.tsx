@@ -1,12 +1,12 @@
 import type { Metadata } from 'next'
-import { Syne, Inter } from 'next/font/google'
+import { Anton, Inter } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
 
-const syne = Syne({
+const anton = Anton({
   subsets:  ['latin'],
   variable: '--font-display',
-  weight:   ['400', '600', '700', '800'],
+  weight:   '400',
   display:  'swap',
 })
 
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${syne.variable} ${inter.variable} font-sans min-h-screen`}>
+      <body className={`${anton.variable} ${inter.variable} font-sans min-h-screen`}>
         <Providers>{children}</Providers>
       </body>
     </html>

@@ -11,18 +11,20 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        display: ['var(--font-display)', 'Syne', 'sans-serif'],
+        display: ['var(--font-display)', 'Anton', 'sans-serif'],
         sans:    ['var(--font-sans)', 'Inter', 'system-ui', 'sans-serif'],
         mono:    ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
       },
       colors: {
-        // CSS variable mapped tokens — emerald accent
+        // CSS variable mapped tokens
         'xen-base':      'var(--bg-base)',
         'xen-secondary': 'var(--bg-secondary)',
         'xen-card':      'var(--bg-card)',
         'xen-elevated':  'var(--bg-elevated)',
         'xen-panel':     'var(--bg-panel)',
         'xen-muted-bg':  'var(--bg-muted)',
+        'xen-yellow':    'var(--yellow)',
+        'xen-accent':    'var(--accent-primary)',
         'xen-green':     'var(--accent-primary)',
         'xen-bright':    'var(--accent-bright)',
         'xen-glow':      'var(--accent-glow)',
@@ -119,10 +121,12 @@ const config: Config = {
         'number-in':       'number-in 0.2s ease-out',
       },
       boxShadow: {
-        'card':       '0 2px 8px rgba(0,0,0,0.4)',
-        'card-lg':    '0 8px 32px rgba(0,0,0,0.5)',
-        'green-glow': '0 0 40px rgba(16,185,129,0.20)',
-        'green-sm':   '0 0 20px rgba(16,185,129,0.14)',
+        'card':        '0 2px 8px rgba(0,0,0,0.15)',
+        'card-lg':     '0 8px 32px rgba(0,0,0,0.25)',
+        'yellow-glow': '0 0 40px rgba(255,229,0,0.25)',
+        'yellow-sm':   '0 0 20px rgba(255,229,0,0.15)',
+        'green-glow':  '0 0 40px rgba(255,229,0,0.20)',
+        'green-sm':    '0 0 20px rgba(255,229,0,0.14)',
       },
     },
   },

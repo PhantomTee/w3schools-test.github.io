@@ -4,22 +4,23 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center whitespace-nowrap font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10B981] focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-40 select-none',
+  'inline-flex items-center justify-center whitespace-nowrap font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)] focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-40 select-none',
   {
     variants: {
       variant: {
-        // Primary — emerald gradient
+        // Primary — black in light mode, yellow in dark mode
         primary:
-          'bg-gradient-to-r from-[#059669] to-[#10B981] text-white hover:from-[#047857] hover:to-[#059669] active:scale-[0.98] rounded-[8px]',
+          'bg-[var(--accent-primary)] text-[var(--accent-text)] hover:opacity-85 active:scale-[0.98] rounded-[8px]',
         xen:
-          'bg-gradient-to-r from-[#059669] to-[#10B981] text-white hover:from-[#047857] hover:to-[#059669] active:scale-[0.98] rounded-[8px]',
+          'bg-[var(--accent-primary)] text-[var(--accent-text)] hover:opacity-85 active:scale-[0.98] rounded-[8px]',
         default:
-          'bg-gradient-to-r from-[#059669] to-[#10B981] text-white hover:from-[#047857] hover:to-[#059669] active:scale-[0.98] rounded-[8px]',
-        // Secondary — dark glass
+          'bg-[var(--accent-primary)] text-[var(--accent-text)] hover:opacity-85 active:scale-[0.98] rounded-[8px]',
+        // Secondary — elevated surface
         secondary:
           'bg-[var(--bg-elevated)] text-[var(--text-secondary)] border border-[var(--border-soft)] hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)] hover:border-[var(--border-strong)] active:scale-[0.98] rounded-[8px]',
+        // Outline
         outline:
-          'bg-transparent border border-[var(--border-soft)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)] hover:border-[var(--border-strong)] active:scale-[0.98] rounded-[8px]',
+          'bg-transparent border border-[var(--border-strong)] text-[var(--text-primary)] hover:bg-[var(--accent-primary)]/10 hover:border-[var(--accent-primary)] active:scale-[0.98] rounded-[8px]',
         // Ghost
         ghost:
           'text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] rounded-[8px]',
@@ -28,7 +29,7 @@ const buttonVariants = cva(
           'bg-[var(--xen-red)]/10 text-[var(--xen-red)] border border-[var(--xen-red)]/20 hover:bg-[var(--xen-red)]/15 rounded-[8px]',
         // Link
         link:
-          'text-[#10B981] underline-offset-4 hover:underline p-0 h-auto',
+          'text-[var(--accent-primary)] underline-offset-4 hover:underline p-0 h-auto',
       },
       size: {
         default: 'h-10 px-5 py-2 text-[14px]',

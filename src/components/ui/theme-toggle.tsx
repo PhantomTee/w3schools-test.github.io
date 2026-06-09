@@ -15,18 +15,18 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
       className={cn(
         'flex items-center gap-1.5 px-2.5 py-1.5 rounded-[10px]',
-        'text-[12px] font-medium text-[var(--text-muted)]',
-        'border border-[var(--border-soft)]',
-        'hover:text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]',
+        'text-[12px] font-medium',
+        'border border-[var(--border-strong)]',
+        'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]',
         'transition-colors',
         className
       )}
     >
-      <span className={cn('transition-colors', isDark ? 'text-[var(--text-muted)]' : 'text-[var(--blue-primary)]')}>
+      <span className={cn('transition-colors', !isDark ? 'text-[var(--accent-primary)] font-semibold' : '')}>
         Light
       </span>
-      <span className="text-[var(--border-soft)]">/</span>
-      <span className={cn('transition-colors', isDark ? 'text-[var(--blue-primary)]' : 'text-[var(--text-muted)]')}>
+      <span className="text-[var(--border-strong)]">/</span>
+      <span className={cn('transition-colors', isDark ? 'text-[var(--accent-primary)] font-semibold' : '')}>
         Dark
       </span>
     </button>
