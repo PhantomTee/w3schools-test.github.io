@@ -2,54 +2,155 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  :root {
-    --background: 224 71% 4%;
-    --foreground: 213 31% 91%;
-    --card: 224 71% 6%;
-    --card-foreground: 213 31% 91%;
-    --popover: 224 71% 6%;
-    --popover-foreground: 213 31% 91%;
-    --primary: 263 70% 60%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 222 47% 11%;
-    --secondary-foreground: 213 31% 91%;
-    --muted: 223 47% 11%;
-    --muted-foreground: 215 20% 55%;
-    --accent: 222 47% 15%;
-    --accent-foreground: 213 31% 91%;
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 216 34% 17%;
-    --input: 216 34% 17%;
-    --ring: 263 70% 60%;
-    --radius: 0.75rem;
-  }
+/* ─── Shadcn HSL tokens (dark default — overridden in light mode) ─────────── */
+:root {
+  --background:              220 38% 4%;
+  --foreground:              210 40% 98%;
+  --card:                    218 55% 9%;
+  --card-foreground:         210 40% 98%;
+  --popover:                 218 43% 10%;
+  --popover-foreground:      210 40% 98%;
+  --primary:                 221 83% 54%;
+  --primary-foreground:      0 0% 100%;
+  --secondary:               218 35% 14%;
+  --secondary-foreground:    215 19% 65%;
+  --muted:                   218 43% 11%;
+  --muted-foreground:        215 16% 47%;
+  --accent:                  218 35% 14%;
+  --accent-foreground:       210 40% 98%;
+  --destructive:             0 84% 60%;
+  --destructive-foreground:  0 0% 100%;
+  --border:                  218 25% 14%;
+  --input:                   218 43% 11%;
+  --ring:                    221 83% 54%;
+  --radius:                  0.75rem;
+
+  /* Xen design tokens — dark default */
+  --bg-base:        #05070B;
+  --bg-secondary:   #080D14;
+  --bg-navy:        #07111F;
+  --bg-card:        #0B1220;
+  --bg-elevated:    #101827;
+  --bg-panel:       #111827;
+  --bg-muted:       #151E2E;
+  --blue-primary:   #2563EB;
+  --blue-bright:    #3B82F6;
+  --blue-glow:      #60A5FA;
+  --blue-deep:      #1D4ED8;
+  --blue-pale:      #BFDBFE;
+  --text-primary:   #F8FAFC;
+  --text-secondary: #94A3B8;
+  --text-muted:     #64748B;
+  --border-soft:    rgba(255,255,255,0.06);
+  --border-active:  rgba(59,130,246,0.45);
+  --glow-blue:      rgba(59,130,246,0.35);
+  --xen-red:        #EF4444;
+  --xen-green:      #22C55E;
+  --xen-amber:      #F59E0B;
 }
 
+/* ─── Light theme overrides ──────────────────────────────────────────────── */
+:root:not(.dark) {
+  --background:              0 0% 100%;
+  --foreground:              222 84% 5%;
+  --card:                    0 0% 100%;
+  --card-foreground:         222 84% 5%;
+  --popover:                 0 0% 100%;
+  --popover-foreground:      222 84% 5%;
+  --secondary:               210 40% 96%;
+  --secondary-foreground:    222 47% 11%;
+  --muted:                   210 40% 96%;
+  --muted-foreground:        215 16% 47%;
+  --accent:                  210 40% 96%;
+  --accent-foreground:       222 47% 11%;
+  --border:                  214 32% 91%;
+  --input:                   214 32% 91%;
+
+  --bg-base:        #FFFFFF;
+  --bg-secondary:   #F8FAFC;
+  --bg-navy:        #F1F5F9;
+  --bg-card:        #FFFFFF;
+  --bg-elevated:    #F8FAFC;
+  --bg-panel:       #F1F5F9;
+  --bg-muted:       #E2E8F0;
+  --blue-pale:      #DBEAFE;
+  --text-primary:   #0F172A;
+  --text-secondary: #475569;
+  --text-muted:     #94A3B8;
+  --border-soft:    rgba(0,0,0,0.07);
+  --border-active:  rgba(37,99,235,0.45);
+  --glow-blue:      rgba(37,99,235,0.15);
+  --xen-red:        #DC2626;
+  --xen-green:      #16A34A;
+  --xen-amber:      #D97706;
+}
+
+/* ─── Base styles ────────────────────────────────────────────────────────── */
 @layer base {
-  * {
-    @apply border-border;
+  * { @apply border-border; }
+
+  html {
+    -webkit-tap-highlight-color: transparent;
   }
+
   body {
-    @apply bg-background text-foreground antialiased;
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     font-feature-settings: "rlig" 1, "calt" 1;
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
+
   h1, h2, h3, h4, h5, h6 {
-    @apply font-semibold tracking-tight;
+    font-weight: 600;
+    letter-spacing: -0.015em;
   }
 }
 
+/* ─── Utility classes ────────────────────────────────────────────────────── */
 @layer utilities {
-  .glow-purple {
-    box-shadow: 0 0 20px rgba(124, 58, 237, 0.3);
+  /* Glow effects */
+  .glow-blue-xs { box-shadow: 0 0 20px var(--glow-blue); }
+  .glow-blue-sm { box-shadow: 0 0 30px var(--glow-blue); }
+  .glow-blue    { box-shadow: 0 0 40px var(--glow-blue); }
+  .glow-blue-lg { box-shadow: 0 0 60px var(--glow-blue); }
+
+  .border-glow-blue {
+    border-color: var(--border-active) !important;
+    box-shadow: 0 0 0 1px rgba(59,130,246,0.12), 0 0 24px rgba(59,130,246,0.08);
   }
-  .glow-green {
-    box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+
+  /* Shimmer */
+  .shimmer {
+    background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-elevated) 50%, var(--bg-card) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.6s infinite;
   }
-  .gradient-border {
-    background: linear-gradient(#0d1117, #0d1117) padding-box,
-                linear-gradient(135deg, #7c3aed, #3b82f6) border-box;
-    border: 1px solid transparent;
+
+  /* Animation helpers */
+  .animate-fade-in    { animation: fade-in 0.25s ease-out; }
+  .animate-sheet-up   { animation: sheet-slide-up 0.32s cubic-bezier(0.32,0.72,0,1); }
+  .animate-card-enter { animation: card-stack-enter 0.3s ease-out; }
+  .animate-card-exit  { animation: card-exit-up 0.35s cubic-bezier(0.4,0,0.2,1) forwards; }
+
+  /* Page background */
+  .bg-page {
+    background:
+      radial-gradient(ellipse 80% 30% at 50% -5%, rgba(37,99,235,0.06) 0%, transparent 70%),
+      var(--bg-base);
+  }
+
+  /* Text */
+  .text-balance { text-wrap: balance; }
+  .tabular-nums { font-variant-numeric: tabular-nums; }
+
+  /* Scrollbar */
+  .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  .hide-scrollbar::-webkit-scrollbar { display: none; }
+
+  /* Progress bar */
+  .progress-blue {
+    background: linear-gradient(90deg, var(--blue-deep), var(--blue-bright));
   }
 }

@@ -34,7 +34,7 @@ export async function attemptMarketResolution(market: Market): Promise<void> {
     }
     const metrics    = normalizeTweetMetrics(tweet)
     const field      = metricField(market.metricType as Market['metricType'])
-    finalValue       = (metrics as Record<string, number | null>)[field.replace('_count', '').replace('impression', 'views')] ?? null
+    finalValue       = (metrics as unknown as Record<string, number | null>)[field.replace('_count', '').replace('impression', 'views')] ?? null
 
     // Map back from normalisedMetrics fields
     if (market.metricType === 'FINAL_VIEWS')   finalValue = metrics.views

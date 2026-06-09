@@ -27,14 +27,21 @@ export interface Market {
   genLayerReportHash: string | null
   creationTxHash: string | null
   resolutionTxHash: string | null
+  evidenceHash: string | null
   winningRangeIndex: number | null
   protocolFeeBps: number
   totalStaked: string
 }
 
 export interface MarketWithPools extends Market {
-  pools: { rangeIndex: number; amount: string }[]
-  userStakes?: { rangeIndex: number; amount: string }[]
+  pools:          { rangeIndex: number; amount: string }[]
+  userStakes?:    { rangeIndex: number; amount: string }[]
+  // API-joined fields
+  xUsername?:     string | null
+  tweetText?:     string | null
+  tweetMediaUrl?: string | null
+  genLayerReport?: any
+  recentBets?:    { walletAddress: string; rangeIndex: number; amount: string; createdAt: string }[]
 }
 
 export interface MarketConfigInput {
