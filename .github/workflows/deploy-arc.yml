@@ -35,12 +35,12 @@ jobs:
         run: node scripts/arc-wallet.mjs
 
       # ── Validate required secrets ─────────────────────────────────────────
+      # ARC_RPC_URL and ARC_USDC_ADDRESS have real defaults — no secret needed.
+      # Only wallet addresses unique to your deployment must be set.
       - name: Validate deployment secrets
         if: steps.wallet.outputs.wallet_generated == 'false'
         run: |
           missing=()
-          [ -z "${{ secrets.ARC_RPC_URL }}"             ] && missing+=("ARC_RPC_URL")
-          [ -z "${{ secrets.ARC_USDC_ADDRESS }}"        ] && missing+=("ARC_USDC_ADDRESS")
           [ -z "${{ secrets.RESOLVER_KEY_ADDRESS }}"    ] && missing+=("RESOLVER_KEY_ADDRESS")
           [ -z "${{ secrets.TRUSTED_SIGNER_ADDRESS }}"  ] && missing+=("TRUSTED_SIGNER_ADDRESS")
           [ -z "${{ secrets.TREASURY_ADDRESS }}"        ] && missing+=("TREASURY_ADDRESS")
@@ -74,8 +74,9 @@ jobs:
           RESOLVER_KEY_ADDRESS:   ${{ secrets.RESOLVER_KEY_ADDRESS }}
           TRUSTED_SIGNER_ADDRESS: ${{ secrets.TRUSTED_SIGNER_ADDRESS }}
           TREASURY_ADDRESS:       ${{ secrets.TREASURY_ADDRESS }}
-          ARC_USDC_ADDRESS:       ${{ secrets.ARC_USDC_ADDRESS }}
-          ARC_RPC_URL:            ${{ secrets.ARC_RPC_URL }}
+          # Real defaults — override via secret only if using a private/alternative node
+          ARC_USDC_ADDRESS:       ${{ secrets.ARC_USDC_ADDRESS || '0x3600000000000000000000000000000000000000' }}
+          ARC_RPC_URL:            ${{ secrets.ARC_RPC_URL || 'https://rpc.testnet.arc.network' }}
           # Optional: set ARC_EXPLORER_API_KEY for automatic contract verification
           ETHERSCAN_API_KEY:      ${{ secrets.ARC_EXPLORER_API_KEY }}
         run: |
