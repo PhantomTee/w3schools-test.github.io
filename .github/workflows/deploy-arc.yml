@@ -35,22 +35,11 @@ jobs:
         run: node scripts/arc-wallet.mjs
 
       # ── Validate required secrets ─────────────────────────────────────────
-      # ARC_RPC_URL and ARC_USDC_ADDRESS have real defaults — no secret needed.
-      # Only wallet addresses unique to your deployment must be set.
+      # One wallet handles everything: resolver, signer, and treasury all
+      # default to the deployer address. No extra address secrets needed.
       - name: Validate deployment secrets
         if: steps.wallet.outputs.wallet_generated == 'false'
-        run: |
-          missing=()
-          [ -z "${{ secrets.RESOLVER_KEY_ADDRESS }}"    ] && missing+=("RESOLVER_KEY_ADDRESS")
-          [ -z "${{ secrets.TRUSTED_SIGNER_ADDRESS }}"  ] && missing+=("TRUSTED_SIGNER_ADDRESS")
-          [ -z "${{ secrets.TREASURY_ADDRESS }}"        ] && missing+=("TREASURY_ADDRESS")
-
-          if [ ${#missing[@]} -gt 0 ]; then
-            echo "Missing required secrets: ${missing[*]}"
-            echo "Add them in GitHub Settings → Secrets → Actions and re-run."
-            exit 1
-          fi
-          echo "All required secrets present ✓"
+        run: echo "All required secrets present ✓"
 
       # ── Foundry ───────────────────────────────────────────────────────────
       - name: Install Foundry
@@ -71,9 +60,10 @@ jobs:
         id: deploy
         env:
           DEPLOYER_PRIVATE_KEY:   ${{ secrets.ARC_DEPLOYER_KEY }}
-          RESOLVER_KEY_ADDRESS:   ${{ secrets.RESOLVER_KEY_ADDRESS }}
-          TRUSTED_SIGNER_ADDRESS: ${{ secrets.TRUSTED_SIGNER_ADDRESS }}
-          TREASURY_ADDRESS:       ${{ secrets.TREASURY_ADDRESS }}
+          # One address for everything — resolver, signer, and treasury all use the deployer
+          RESOLVER_KEY_ADDRESS:   ${{ steps.wallet.outputs.deployer_address }}
+          TRUSTED_SIGNER_ADDRESS: ${{ steps.wallet.outputs.deployer_address }}
+          TREASURY_ADDRESS:       ${{ steps.wallet.outputs.deployer_address }}
           # Real defaults — override via secret only if using a private/alternative node
           ARC_USDC_ADDRESS:       ${{ secrets.ARC_USDC_ADDRESS || '0x3600000000000000000000000000000000000000' }}
           ARC_RPC_URL:            ${{ secrets.ARC_RPC_URL || 'https://rpc.testnet.arc.network' }}
