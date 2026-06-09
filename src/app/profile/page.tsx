@@ -1,6 +1,6 @@
 'use client'
 import Link from 'next/link'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAccount } from 'wagmi'
 import { AppShell } from '@/components/layout/AppShell'
 import { Button } from '@/components/ui/button'
@@ -17,6 +17,7 @@ function formatDate(iso: string | null) {
 
 export default function ProfilePage() {
   const { address, isConnected } = useAccount()
+  const queryClient = useQueryClient()
 
   const { data: meData } = useQuery({
     queryKey: ['me'],
@@ -24,6 +25,11 @@ export default function ProfilePage() {
     staleTime: 60_000,
   })
   const user = meData?.user
+
+  async function handleDisconnectX() {
+    await fetch('/api/auth/x', { method: 'DELETE' })
+    queryClient.invalidateQueries({ queryKey: ['me'] })
+  }
 
   return (
     <AppShell>
@@ -87,7 +93,12 @@ export default function ProfilePage() {
                   </p>
                 )}
               </div>
-              <Button variant="ghost" size="sm" className="text-[var(--xen-red)]/70 hover:text-[var(--xen-red)]">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-[var(--xen-red)]/70 hover:text-[var(--xen-red)]"
+                onClick={handleDisconnectX}
+              >
                 Disconnect
               </Button>
             </div>
@@ -126,7 +137,7 @@ export default function ProfilePage() {
           </div>
           <p className="text-[13px] text-[var(--text-muted)] leading-relaxed">
             Your created markets will appear here. Head to the{' '}
-            <Link href="/markets" className="text-[var(--blue-bright)] hover:underline">Markets page</Link>
+            <Link href="/markets" className="text-[var(--accent-primary)] hover:underline">Markets page</Link>
             {' '}to browse all open markets.
           </p>
         </div>

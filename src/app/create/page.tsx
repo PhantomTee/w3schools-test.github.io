@@ -12,20 +12,20 @@ import type { MetricType } from '@/types/market'
 type Step = 1 | 2 | 3 | 4 | 5
 
 interface Tweet {
-  id:            string
-  tweetId:       string
-  text:          string
-  publicMetrics: { view_count: number; like_count: number; retweet_count: number; reply_count: number }
-  eligible:      boolean
+  id:               string
+  tweetId:          string
+  text:             string
+  normalizedMetrics: { views: number; likes: number; reposts: number; replies: number }
+  eligible:         boolean
   eligibilityNote?: string
-  createdAtOnX:  string
+  createdAtOnX:     string
 }
 
-const METRICS: { key: MetricType; label: string; metricKey: keyof Tweet['publicMetrics'] }[] = [
-  { key: 'FINAL_VIEWS',   label: 'Final Views',   metricKey: 'view_count'    },
-  { key: 'FINAL_LIKES',   label: 'Final Likes',   metricKey: 'like_count'    },
-  { key: 'FINAL_REPOSTS', label: 'Final Reposts', metricKey: 'retweet_count' },
-  { key: 'FINAL_REPLIES', label: 'Final Replies', metricKey: 'reply_count'   },
+const METRICS: { key: MetricType; label: string; metricKey: keyof Tweet['normalizedMetrics'] }[] = [
+  { key: 'FINAL_VIEWS',   label: 'Final Views',   metricKey: 'views'   },
+  { key: 'FINAL_LIKES',   label: 'Final Likes',   metricKey: 'likes'   },
+  { key: 'FINAL_REPOSTS', label: 'Final Reposts', metricKey: 'reposts' },
+  { key: 'FINAL_REPLIES', label: 'Final Replies', metricKey: 'replies' },
 ]
 
 const DURATIONS = [1, 3, 6, 12, 24, 48]
@@ -69,8 +69,8 @@ export default function CreatePage() {
     setGenerating(true)
     setGenError(null)
     try {
-      const metricDef = METRICS.find(m => m.key === selectedMetric)!
-      const startValue = selectedTweet.publicMetrics[metricDef.metricKey]
+      const metricDef  = METRICS.find(m => m.key === selectedMetric)!
+      const startValue = selectedTweet.normalizedMetrics[metricDef.metricKey]
       const res = await fetch('/api/genlayer/design', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -126,7 +126,7 @@ export default function CreatePage() {
           className={cn(
             'rounded-full transition-all duration-200',
             step >= s
-              ? 'w-4 h-1.5 bg-[var(--blue-bright)]'
+              ? 'w-4 h-1.5 bg-[var(--accent-primary)]'
               : 'w-1.5 h-1.5 bg-[var(--border-soft)] border border-[var(--border-soft)]'
           )}
         />
@@ -179,13 +179,13 @@ export default function CreatePage() {
                     )}>
                       <p className="text-[var(--text-muted)]">{m.label.replace('Final ', '')}</p>
                       <p className="text-[var(--text-primary)] font-semibold tabular-nums">
-                        {formatMetric(selectedTweet.publicMetrics[m.metricKey])}
+                        {formatMetric(selectedTweet.normalizedMetrics[m.metricKey])}
                       </p>
                     </div>
                   ))}
                 </div>
                 {selectedMetric && selectedDuration && (
-                  <div className="mt-4 p-3 bg-[var(--blue-primary)]/[0.06] rounded-[12px] border border-[var(--border-active)]">
+                  <div className="mt-4 p-3 bg-[var(--accent-primary)]/[0.06] rounded-[12px] border border-[var(--border-active)]">
                     <p className="text-[13px] font-medium text-[var(--text-primary)]">
                       What will this tweet&apos;s {selectedMetric.replace('FINAL_', '').toLowerCase()} be in {selectedDuration}h?
                     </p>
@@ -210,13 +210,13 @@ export default function CreatePage() {
               </p>
 
               {!isConnected && (
-                <div className="bg-[var(--blue-primary)]/[0.06] border border-[var(--border-active)] rounded-[14px] p-4 mb-3">
+                <div className="bg-[var(--accent-primary)]/[0.06] border border-[var(--border-active)] rounded-[14px] p-4 mb-3">
                   <p className="text-[13px] text-[var(--text-secondary)]">Connect your wallet to get started.</p>
                 </div>
               )}
 
               {isConnected && !me?.xUsername && (
-                <div className="bg-[var(--blue-primary)]/[0.06] border border-[var(--border-active)] rounded-[14px] p-4 mb-3">
+                <div className="bg-[var(--accent-primary)]/[0.06] border border-[var(--border-active)] rounded-[14px] p-4 mb-3">
                   <p className="text-[13px] text-[var(--text-secondary)] mb-2">
                     Connect your X account to see your tweets.
                   </p>
@@ -243,8 +243,8 @@ export default function CreatePage() {
                       className={cn(
                         'w-full text-left p-3.5 rounded-[16px] border transition-all',
                         selectedTweet?.id === tweet.id
-                          ? 'border-[var(--border-active)] bg-[var(--blue-primary)]/[0.06]'
-                          : 'border-[var(--border-soft)] bg-[var(--bg-elevated)] hover:border-[rgba(59,130,246,0.3)]'
+                          ? 'border-[var(--border-active)] bg-[var(--accent-primary)]/[0.06]'
+                          : 'border-[var(--border-soft)] bg-[var(--bg-elevated)] hover:border-[rgba(16,185,129,0.3)]'
                       )}
                     >
                       <div className="flex items-start justify-between gap-2 mb-2">
@@ -254,9 +254,9 @@ export default function CreatePage() {
                         </Badge>
                       </div>
                       <div className="flex gap-3 text-[10px] text-[var(--text-muted)] tabular-nums">
-                        <span>{formatMetric(tweet.publicMetrics.view_count)} views</span>
-                        <span>{formatMetric(tweet.publicMetrics.like_count)} likes</span>
-                        <span>{formatMetric(tweet.publicMetrics.retweet_count)} reposts</span>
+                        <span>{formatMetric(tweet.normalizedMetrics.views)} views</span>
+                        <span>{formatMetric(tweet.normalizedMetrics.likes)} likes</span>
+                        <span>{formatMetric(tweet.normalizedMetrics.reposts)} reposts</span>
                       </div>
                     </button>
                   ))}
@@ -278,14 +278,14 @@ export default function CreatePage() {
                       className={cn(
                         'p-3.5 rounded-[14px] border text-left transition-all',
                         selectedMetric === m.key
-                          ? 'border-[var(--border-active)] bg-[var(--blue-primary)]/[0.06]'
-                          : 'border-[var(--border-soft)] bg-[var(--bg-elevated)] hover:border-[rgba(59,130,246,0.3)]'
+                          ? 'border-[var(--border-active)] bg-[var(--accent-primary)]/[0.06]'
+                          : 'border-[var(--border-soft)] bg-[var(--bg-elevated)] hover:border-[rgba(16,185,129,0.3)]'
                       )}
                     >
                       <p className="text-[13px] font-medium text-[var(--text-primary)] mb-0.5">{m.label}</p>
                       {selectedTweet && (
                         <p className="text-[11px] text-[var(--text-muted)] tabular-nums">
-                          {formatMetric(selectedTweet.publicMetrics[m.metricKey])} now
+                          {formatMetric(selectedTweet.normalizedMetrics[m.metricKey])} now
                         </p>
                       )}
                     </button>
@@ -308,8 +308,8 @@ export default function CreatePage() {
                       className={cn(
                         'px-4 py-2 rounded-[10px] text-[13px] font-medium border transition-all',
                         selectedDuration === d
-                          ? 'border-[var(--border-active)] bg-[var(--blue-primary)] text-white'
-                          : 'border-[var(--border-soft)] bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:border-[rgba(59,130,246,0.3)]'
+                          ? 'border-[var(--border-active)] bg-[var(--accent-primary)] text-white'
+                          : 'border-[var(--border-soft)] bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:border-[rgba(16,185,129,0.3)]'
                       )}
                     >
                       {d}h
@@ -328,7 +328,7 @@ export default function CreatePage() {
                 {generating ? (
                   <div className="text-center py-6">
                     <div className="h-1.5 w-full rounded-full bg-[var(--bg-muted)] overflow-hidden mb-3">
-                      <div className="h-full w-1/2 bg-[var(--blue-primary)] animate-[shimmer_1.5s_ease-in-out_infinite] rounded-full" />
+                      <div className="h-full w-1/2 bg-[var(--accent-primary)] animate-[shimmer_1.5s_ease-in-out_infinite] rounded-full" />
                     </div>
                     <p className="text-[13px] text-[var(--text-muted)]">
                       GenLayer is designing time-aware ranges…
@@ -370,14 +370,14 @@ export default function CreatePage() {
 
                   <div className="flex gap-4 text-[11px] mb-2">
                     <span className="text-[var(--text-muted)]">
-                      Quality <span className="text-[var(--xen-green)] font-medium">{genResult.qualityScore}/100</span>
+                      Quality <span className="text-[var(--accent-primary)] font-medium">{genResult.qualityScore}/100</span>
                     </span>
                     <span className="text-[var(--text-muted)]">
                       Risk <span className="text-[var(--xen-amber)] font-medium">{genResult.riskScore}/10</span>
                     </span>
                     <span className="text-[var(--text-muted)]">
                       {genResult.approved
-                        ? <span className="text-[var(--xen-green)]">Approved</span>
+                        ? <span className="text-[var(--accent-primary)]">Approved</span>
                         : <span className="text-[var(--xen-red)]">Rejected</span>}
                     </span>
                   </div>
