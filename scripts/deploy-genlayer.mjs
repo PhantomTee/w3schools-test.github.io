@@ -59,7 +59,7 @@ const fundRes = await fetch(RPC, {
     jsonrpc: '2.0',
     id     : 1,
     method : 'sim_fundAccount',
-    params : [account.address, '10000000000000000000'], // 10 tokens
+    params : [account.address, '10000000000000000000000'], // 10,000 GEN
   }),
 })
 
