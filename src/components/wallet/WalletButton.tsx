@@ -5,6 +5,10 @@ import { Button } from '@/components/ui/button'
 import { shortenAddress } from '@/lib/utils'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 
+async function safeJson(res: Response) {
+  try { return await res.json() } catch { return {} }
+}
+
 export function WalletButton() {
   const { address, isConnected } = useAccount()
   const { connect, connectors }  = useConnect()
@@ -12,12 +16,18 @@ export function WalletButton() {
   const { signMessageAsync }     = useSignMessage()
   const [open, setOpen]          = useState(false)
   const [loading, setLoading]    = useState(false)
+  const [signError, setSignError] = useState<string | null>(null)
   const qc = useQueryClient()
 
   const { data: me } = useQuery({
     queryKey:  ['me'],
-    queryFn:   () => fetch('/api/auth/me').then(r => r.json()),
+    queryFn:   async () => {
+      const res = await fetch('/api/auth/me')
+      if (!res.ok) return {}
+      return safeJson(res)
+    },
     staleTime: 60_000,
+    retry:     false,
   })
 
   const isAuthed = !!me?.user?.walletAddress
@@ -32,18 +42,28 @@ export function WalletButton() {
   async function handleSignIn() {
     if (!address) return
     setLoading(true)
+    setSignError(null)
     try {
-      const { nonce } = await fetch('/api/auth/wallet').then(r => r.json())
+      const nonceRes = await fetch('/api/auth/wallet')
+      if (!nonceRes.ok) throw new Error(`Server error ${nonceRes.status}`)
+      const { nonce } = await safeJson(nonceRes)
+      if (!nonce) throw new Error('No nonce returned')
+
       const message   = `Sign in to Xen\n\nWallet: ${address}\nNonce: ${nonce}`
       const signature = await signMessageAsync({ message })
-      await fetch('/api/auth/wallet', {
+
+      const authRes = await fetch('/api/auth/wallet', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ address, message, signature }),
       })
+      if (!authRes.ok) {
+        const body = await safeJson(authRes)
+        throw new Error(body?.error ?? `Server error ${authRes.status}`)
+      }
       await qc.invalidateQueries({ queryKey: ['me'] })
     } catch (e) {
-      console.error('Sign in error:', e)
+      setSignError((e as Error).message)
     } finally {
       setLoading(false)
       setOpen(false)
@@ -51,7 +71,7 @@ export function WalletButton() {
   }
 
   async function handleDisconnect() {
-    await fetch('/api/auth/wallet', { method: 'DELETE' })
+    await fetch('/api/auth/wallet', { method: 'DELETE' }).catch(() => {})
     disconnect()
     await qc.invalidateQueries({ queryKey: ['me'] })
     setOpen(false)
@@ -67,9 +87,14 @@ export function WalletButton() {
 
   if (!isAuthed) {
     return (
-      <Button variant="outline" size="sm" onClick={handleSignIn} disabled={loading}>
-        {loading ? 'Signing...' : 'Sign In'}
-      </Button>
+      <div className="flex flex-col items-end gap-1">
+        <Button variant="outline" size="sm" onClick={handleSignIn} disabled={loading}>
+          {loading ? 'Signing...' : 'Sign In'}
+        </Button>
+        {signError && (
+          <p className="text-[11px] text-[#EF4444] max-w-[200px] text-right">{signError}</p>
+        )}
+      </div>
     )
   }
 

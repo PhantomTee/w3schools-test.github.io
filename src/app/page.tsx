@@ -77,7 +77,7 @@ export default function LandingPage() {
                   </div>
                 </div>
 
-                <div className="space-y-2 mb-4">
+                <div className="space-y-2">
                   {[
                     { label: '1.2k – 2k', pct: 22 },
                     { label: '2k – 4k',   pct: 38 },
@@ -91,12 +91,6 @@ export default function LandingPage() {
                       </div>
                       <span className="text-[12px] text-[#94A3B8] w-16 text-right">{r.label}</span>
                     </div>
-                  ))}
-                </div>
-
-                <div className="flex flex-wrap gap-1.5 pt-4 border-t border-white/[0.05]">
-                  {['Arc settlement', 'USDC pool', 'GenLayer ranges', 'X API source'].map(l => (
-                    <span key={l} className="text-[11px] px-2 py-0.5 rounded-full bg-white/[0.04] text-[#64748B]">{l}</span>
                   ))}
                 </div>
               </div>
@@ -158,16 +152,6 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Disclaimer */}
-        <section className="py-8 px-5 border-t border-white/[0.04]">
-          <div className="container mx-auto max-w-xl text-center">
-            <p className="text-[12px] text-[#64748B] leading-relaxed">
-              Participation involves financial risk. Xen uses X API public metrics for market resolution.
-              Markets may enter void if data cannot be verified at settlement. Not financial advice.
-              Participation is subject to the laws of your jurisdiction.
-            </p>
-          </div>
-        </section>
       </main>
 
       <Footer />
