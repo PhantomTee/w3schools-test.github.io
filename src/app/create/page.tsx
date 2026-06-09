@@ -49,6 +49,8 @@ export default function CreatePage() {
   const [creating,         setCreating]         = useState(false)
   const [createError,      setCreateError]      = useState<string | null>(null)
   const [createdMarketId,  setCreatedMarketId]  = useState<string | null>(null)
+  const [sharing,          setSharing]          = useState(false)
+  const [shared,           setShared]           = useState(false)
 
   const { data: meData } = useQuery({
     queryKey: ['me'],
@@ -89,6 +91,25 @@ export default function CreatePage() {
       setGenError((e as Error).message)
     } finally {
       setGenerating(false)
+    }
+  }
+
+  async function handleShareOnX() {
+    if (sharing || shared || !selectedMetric || !selectedDuration) return
+    setSharing(true)
+    const metric = selectedMetric.replace('FINAL_', '').toLowerCase()
+    const text   = `Just created a prediction market on Xen: what will this tweet's ${metric} be in ${selectedDuration}h? xen.markets/market/${createdMarketId}`
+    try {
+      await fetch('/api/x/post', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ text }),
+      })
+      setShared(true)
+    } catch {
+      // silent — sharing is optional
+    } finally {
+      setSharing(false)
     }
   }
 
@@ -143,10 +164,18 @@ export default function CreatePage() {
           <p className="text-[14px] text-[var(--text-muted)] mb-6">
             Your market is live on Xen. Share it so others can predict.
           </p>
-          <div className="flex gap-2 justify-center">
+          <div className="flex flex-wrap gap-2 justify-center">
             <Link href={`/market/${createdMarketId}`}>
               <Button variant="xen" size="lg">View Market</Button>
             </Link>
+            <Button
+              variant="secondary"
+              size="lg"
+              onClick={handleShareOnX}
+              disabled={sharing || shared}
+            >
+              {shared ? 'Shared' : sharing ? 'Sharing…' : 'Share on X'}
+            </Button>
             <Link href="/feed">
               <Button variant="outline" size="lg">Back to Feed</Button>
             </Link>

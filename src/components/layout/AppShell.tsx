@@ -109,6 +109,27 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </nav>
 
         <div className="p-3 border-t border-[var(--border-soft)] space-y-2">
+          {me?.user?.xUsername && (
+            <div className="flex items-center gap-2 px-1 py-1">
+              {me.user.xAvatarUrl ? (
+                <img
+                  src={me.user.xAvatarUrl}
+                  alt="X avatar"
+                  className="h-7 w-7 rounded-full object-cover border border-[var(--border-soft)] shrink-0"
+                />
+              ) : (
+                <span className="h-7 w-7 rounded-full bg-[var(--bg-elevated)] border border-[var(--border-soft)] shrink-0" />
+              )}
+              <div className="min-w-0">
+                <p className="text-[12px] font-medium text-[var(--text-primary)] truncate">@{me.user.xUsername}</p>
+                {me.user.xFollowerCount != null && (
+                  <p className="text-[10px] text-[var(--text-muted)] tabular-nums">
+                    {me.user.xFollowerCount.toLocaleString()} followers
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
           <WalletButton />
           <ThemeToggle className="w-full justify-center" />
         </div>
@@ -143,7 +164,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </div>
             )}
 
-            <WalletButton />
+            <div className="flex items-center gap-2">
+              {me?.user?.xAvatarUrl && (
+                <img
+                  src={me.user.xAvatarUrl}
+                  alt="X avatar"
+                  className="h-7 w-7 rounded-full object-cover border border-[var(--border-soft)]"
+                />
+              )}
+              <WalletButton />
+            </div>
           </div>
 
           {/* X status row */}
@@ -152,6 +182,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <span>@{me.user.xUsername}</span>
               <span className="h-1 w-1 rounded-full bg-[var(--xen-green)]" />
               <span className="text-[var(--xen-green)]">X connected</span>
+              {me.user.xFollowerCount != null && (
+                <>
+                  <span className="h-1 w-1 rounded-full bg-[var(--border-soft)]" />
+                  <span>{me.user.xFollowerCount.toLocaleString()} followers</span>
+                </>
+              )}
             </div>
           )}
         </header>

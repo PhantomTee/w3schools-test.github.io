@@ -16,6 +16,8 @@ model User {
   xAccessToken    String?   // encrypted at application layer
   xRefreshToken   String?   // encrypted at application layer
   xTokenExpiresAt DateTime?
+  xAvatarUrl      String?
+  xFollowerCount  Int?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 

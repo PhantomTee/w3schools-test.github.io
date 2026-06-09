@@ -36,7 +36,7 @@ export function getOAuthUrl(state: string, codeChallenge: string): string {
     response_type:         'code',
     client_id:             CLIENT_ID,
     redirect_uri:          CALLBACK_URL,
-    scope:                 'tweet.read users.read offline.access',
+    scope:                 'tweet.read tweet.write users.read offline.access',
     state,
     code_challenge:        codeChallenge,
     code_challenge_method: 'S256',
@@ -115,21 +115,47 @@ export async function refreshAccessToken(refreshToken: string): Promise<XTokens>
 // ─── User info ────────────────────────────────────────────────────────────────
 
 export interface XUser {
-  id:       string
-  name:     string
-  username: string
+  id:            string
+  name:          string
+  username:      string
+  avatarUrl?:    string
+  followerCount?: number
 }
 
 export async function getUserByMe(accessToken: string): Promise<XUser> {
-  const res = await fetch(`${X_API_BASE}/2/users/me?user.fields=id,name,username`, {
-    headers: { Authorization: `Bearer ${accessToken}` },
-  })
+  const res = await fetch(
+    `${X_API_BASE}/2/users/me?user.fields=id,name,username,profile_image_url,public_metrics`,
+    { headers: { Authorization: `Bearer ${accessToken}` } }
+  )
   if (!res.ok) {
     const err = await res.text()
     throw new Error(`X /users/me failed: ${res.status} ${err}`)
   }
   const { data } = await res.json()
-  return { id: data.id, name: data.name, username: data.username }
+  return {
+    id:            data.id,
+    name:          data.name,
+    username:      data.username,
+    avatarUrl:     data.profile_image_url?.replace('_normal', '_400x400') ?? undefined,
+    followerCount: data.public_metrics?.followers_count ?? undefined,
+  }
+}
+
+export async function postTweet(text: string, accessToken: string): Promise<{ id: string }> {
+  const res = await fetch(`${X_API_BASE}/2/tweets`, {
+    method:  'POST',
+    headers: {
+      Authorization:  `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ text }),
+  })
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(`X POST /2/tweets failed: ${res.status} ${err}`)
+  }
+  const { data } = await res.json()
+  return { id: data.id }
 }
 
 // ─── Tweet fields ─────────────────────────────────────────────────────────────
