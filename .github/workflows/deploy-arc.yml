@@ -1,0 +1,139 @@
+name: Deploy Arc Contracts
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Simulate only — no on-chain broadcast'
+        type: boolean
+        default: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # ── Node (for wallet generation script) ───────────────────────────────
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install viem (wallet keygen)
+        run: npm install --no-save viem
+
+      # ── Wallet setup ──────────────────────────────────────────────────────
+      # If ARC_DEPLOYER_KEY is not set, generates a fresh wallet, prints the
+      # address for funding, and exits. Add the secret + fund the address,
+      # then re-run to proceed to deployment.
+      - name: Setup deployer wallet
+        id: wallet
+        env:
+          ARC_DEPLOYER_KEY: ${{ secrets.ARC_DEPLOYER_KEY }}
+        run: node scripts/arc-wallet.mjs
+
+      # ── Validate required secrets ─────────────────────────────────────────
+      - name: Validate deployment secrets
+        if: steps.wallet.outputs.wallet_generated == 'false'
+        run: |
+          missing=()
+          [ -z "${{ secrets.ARC_RPC_URL }}"             ] && missing+=("ARC_RPC_URL")
+          [ -z "${{ secrets.ARC_USDC_ADDRESS }}"        ] && missing+=("ARC_USDC_ADDRESS")
+          [ -z "${{ secrets.RESOLVER_KEY_ADDRESS }}"    ] && missing+=("RESOLVER_KEY_ADDRESS")
+          [ -z "${{ secrets.TRUSTED_SIGNER_ADDRESS }}"  ] && missing+=("TRUSTED_SIGNER_ADDRESS")
+          [ -z "${{ secrets.TREASURY_ADDRESS }}"        ] && missing+=("TREASURY_ADDRESS")
+
+          if [ ${#missing[@]} -gt 0 ]; then
+            echo "Missing required secrets: ${missing[*]}"
+            echo "Add them in GitHub Settings → Secrets → Actions and re-run."
+            exit 1
+          fi
+          echo "All required secrets present ✓"
+
+      # ── Foundry ───────────────────────────────────────────────────────────
+      - name: Install Foundry
+        if: steps.wallet.outputs.wallet_generated == 'false'
+        uses: foundry-rs/foundry-toolchain@v1
+
+      - name: Install Forge dependencies
+        if: steps.wallet.outputs.wallet_generated == 'false'
+        run: cd contracts && forge install
+
+      - name: Build contracts
+        if: steps.wallet.outputs.wallet_generated == 'false'
+        run: cd contracts && forge build
+
+      # ── Deploy ────────────────────────────────────────────────────────────
+      - name: Deploy XenResolver + XenFactory
+        if: steps.wallet.outputs.wallet_generated == 'false'
+        id: deploy
+        env:
+          DEPLOYER_PRIVATE_KEY:   ${{ secrets.ARC_DEPLOYER_KEY }}
+          RESOLVER_KEY_ADDRESS:   ${{ secrets.RESOLVER_KEY_ADDRESS }}
+          TRUSTED_SIGNER_ADDRESS: ${{ secrets.TRUSTED_SIGNER_ADDRESS }}
+          TREASURY_ADDRESS:       ${{ secrets.TREASURY_ADDRESS }}
+          ARC_USDC_ADDRESS:       ${{ secrets.ARC_USDC_ADDRESS }}
+          ARC_RPC_URL:            ${{ secrets.ARC_RPC_URL }}
+          # Optional: set ARC_EXPLORER_API_KEY for automatic contract verification
+          ETHERSCAN_API_KEY:      ${{ secrets.ARC_EXPLORER_API_KEY }}
+        run: |
+          cd contracts
+
+          BROADCAST_FLAG=""
+          VERIFY_FLAG=""
+          if [ "${{ inputs.dry_run }}" != "true" ]; then
+            BROADCAST_FLAG="--broadcast"
+            [ -n "$ETHERSCAN_API_KEY" ] && VERIFY_FLAG="--verify"
+          fi
+
+          forge script script/Deploy.s.sol \
+            --rpc-url "$ARC_RPC_URL" \
+            $BROADCAST_FLAG \
+            $VERIFY_FLAG \
+            -vvv 2>&1 | tee /tmp/deploy-output.txt
+
+          # Parse deployed addresses from forge output
+          FACTORY_ADDR=$(grep -E "^  XenFactory:" /tmp/deploy-output.txt | awk '{print $2}' | head -1)
+          RESOLVER_ADDR=$(grep -E "^  XenResolver:" /tmp/deploy-output.txt | awk '{print $2}' | head -1)
+
+          echo "factory_address=${FACTORY_ADDR}"   >> $GITHUB_OUTPUT
+          echo "resolver_address=${RESOLVER_ADDR}" >> $GITHUB_OUTPUT
+
+          echo "XenFactory  : ${FACTORY_ADDR}"
+          echo "XenResolver : ${RESOLVER_ADDR}"
+
+      # ── Summary ───────────────────────────────────────────────────────────
+      - name: Job summary
+        if: always()
+        run: |
+          echo "## Arc Contract Deployment" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ steps.wallet.outputs.wallet_generated }}" == "true" ]; then
+            echo "### Wallet generated — action required" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "A fresh deployer wallet was created. Check the logs for the private key." >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "1. Save \`ARC_DEPLOYER_KEY\` in GitHub Settings → Secrets → Actions" >> $GITHUB_STEP_SUMMARY
+            echo "2. Fund \`${{ steps.wallet.outputs.deployer_address }}\` on Arc testnet" >> $GITHUB_STEP_SUMMARY
+            echo "3. Re-run this workflow to deploy" >> $GITHUB_STEP_SUMMARY
+          elif [ -n "${{ steps.deploy.outputs.factory_address }}" ]; then
+            DRY="${{ inputs.dry_run }}"
+            [ "$DRY" == "true" ] && echo "**Dry run — no broadcast**" >> $GITHUB_STEP_SUMMARY || echo "✅ **Deployed successfully**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "| Contract | Address |" >> $GITHUB_STEP_SUMMARY
+            echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+            echo "| XenFactory  | \`${{ steps.deploy.outputs.factory_address }}\` |"  >> $GITHUB_STEP_SUMMARY
+            echo "| XenResolver | \`${{ steps.deploy.outputs.resolver_address }}\` |" >> $GITHUB_STEP_SUMMARY
+            echo "| Deployer    | \`${{ steps.wallet.outputs.deployer_address }}\` |" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Next steps:** set these in Vercel + \`.env\`:" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            echo "NEXT_PUBLIC_XEN_FACTORY_ADDRESS=${{ steps.deploy.outputs.factory_address }}" >> $GITHUB_STEP_SUMMARY
+            echo "NEXT_PUBLIC_XEN_RESOLVER_ADDRESS=${{ steps.deploy.outputs.resolver_address }}" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Deployment did not produce contract addresses — check logs." >> $GITHUB_STEP_SUMMARY
+          fi
