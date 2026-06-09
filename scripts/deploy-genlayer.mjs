@@ -52,15 +52,14 @@ if (generated) {
 const RPC = process.env.GENLAYER_NODE_URL || 'https://studio.genlayer.com/api'
 console.log(`\nFunding ${account.address} on GenLayer Studionet (${RPC})...`)
 
+// Build body manually — amount must be a JSON integer, not a string.
+// JSON.stringify would quote BigInt; a JS number loses precision at this scale.
+const fundBody = `{"jsonrpc":"2.0","id":1,"method":"sim_fundAccount","params":["${account.address}",10000000000000000000000]}`
+
 const fundRes = await fetch(RPC, {
   method : 'POST',
   headers: { 'Content-Type': 'application/json' },
-  body   : JSON.stringify({
-    jsonrpc: '2.0',
-    id     : 1,
-    method : 'sim_fundAccount',
-    params : [account.address, '10000000000000000000000'], // 10,000 GEN
-  }),
+  body   : fundBody,
 })
 
 if (!fundRes.ok) {
