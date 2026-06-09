@@ -99,7 +99,11 @@ const receipt = await client.waitForTransactionReceipt({
   timeout: 90_000,
 })
 
-const contractAddress = receipt?.contractAddress
+// GenLayer receipt uses contract_snapshot.contract_address, not contractAddress
+const contractAddress =
+  receipt?.contractAddress ??
+  receipt?.contract_snapshot?.contract_address
+
 if (!contractAddress) {
   console.error('Receipt:', JSON.stringify(receipt, null, 2))
   throw new Error('No contractAddress in receipt — deployment may have failed')
