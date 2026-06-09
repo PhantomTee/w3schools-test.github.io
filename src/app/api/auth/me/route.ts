@@ -11,10 +11,12 @@ export async function GET() {
   const user = await prisma.user.findUnique({
     where: { walletAddress: session.user.walletAddress },
     select: {
-      walletAddress: true,
-      xUserId:       true,
-      xUsername:     true,
-      xConnectedAt:  true,
+      walletAddress:  true,
+      xUserId:        true,
+      xUsername:      true,
+      xConnectedAt:   true,
+      xAvatarUrl:     true,
+      xFollowerCount: true,
       _count: { select: { markets: true } },
     },
   })
@@ -33,6 +35,8 @@ export async function GET() {
       xUserId:             user.xUserId,
       xUsername:           user.xUsername,
       xConnectedAt:        user.xConnectedAt?.toISOString() ?? null,
+      xAvatarUrl:          user.xAvatarUrl,
+      xFollowerCount:      user.xFollowerCount,
       marketsCreatedToday: marketsToday,
       totalMarketsCreated: user._count.markets,
     },

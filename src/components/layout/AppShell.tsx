@@ -52,7 +52,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <aside className="hidden md:flex flex-col w-[220px] shrink-0 h-screen sticky top-0 border-r border-[var(--border-soft)] bg-[var(--bg-base)]">
         <div className="px-6 pt-7 pb-5 flex items-center justify-between">
           <Link href="/">
-            <span className="text-[20px] font-semibold tracking-tight text-[var(--text-primary)]">Xen</span>
+            <span className="font-display text-[20px] font-bold tracking-tight text-[var(--text-primary)]">Xen</span>
           </Link>
         </div>
 
@@ -67,7 +67,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </div>
             <div className="flex justify-between items-baseline">
               <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">Portfolio</span>
-              <span className="text-[13px] font-semibold text-[var(--blue-bright)] tabular-nums">
+              <span className="text-[13px] font-semibold text-[var(--accent-primary)] tabular-nums">
                 {balanceLoading ? '—' : `${portfolio} USDC`}
               </span>
             </div>
@@ -82,7 +82,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               className={cn(
                 'block px-3 py-2.5 rounded-[12px] text-[14px] font-medium transition-all duration-150',
                 isActive(n.href)
-                  ? 'bg-[var(--blue-primary)]/[0.12] text-[var(--text-primary)]'
+                  ? 'bg-[var(--accent-primary)]/[0.10] text-[var(--accent-primary)]'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]'
               )}
             >
@@ -98,7 +98,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 className={cn(
                   'block px-3 py-2.5 rounded-[12px] text-[14px] font-medium transition-all duration-150',
                   isActive(n.href)
-                    ? 'bg-[var(--blue-primary)]/[0.12] text-[var(--text-primary)]'
+                    ? 'bg-[var(--accent-primary)]/[0.10] text-[var(--accent-primary)]'
                     : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]'
                 )}
               >
@@ -109,6 +109,27 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </nav>
 
         <div className="p-3 border-t border-[var(--border-soft)] space-y-2">
+          {me?.user?.xUsername && (
+            <div className="flex items-center gap-2 px-1 py-1">
+              {me.user.xAvatarUrl ? (
+                <img
+                  src={me.user.xAvatarUrl}
+                  alt="X avatar"
+                  className="h-7 w-7 rounded-full object-cover border border-[var(--border-soft)] shrink-0"
+                />
+              ) : (
+                <span className="h-7 w-7 rounded-full bg-[var(--bg-elevated)] border border-[var(--border-soft)] shrink-0" />
+              )}
+              <div className="min-w-0">
+                <p className="text-[12px] font-medium text-[var(--text-primary)] truncate">@{me.user.xUsername}</p>
+                {me.user.xFollowerCount != null && (
+                  <p className="text-[10px] text-[var(--text-muted)] tabular-nums">
+                    {me.user.xFollowerCount.toLocaleString()} followers
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
           <WalletButton />
           <ThemeToggle className="w-full justify-center" />
         </div>
@@ -121,7 +142,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <header className="md:hidden sticky top-0 z-40 border-b border-[var(--border-soft)] bg-[var(--bg-base)]/95 backdrop-blur-md">
           <div className="flex items-center justify-between h-14 px-5">
             <Link href="/">
-              <span className="text-[18px] font-semibold tracking-tight text-[var(--text-primary)]">Xen</span>
+              <span className="font-display text-[18px] font-bold tracking-tight text-[var(--text-primary)]">Xen</span>
             </Link>
 
             {/* Cash + portfolio balance (mobile header center) */}
@@ -136,14 +157,23 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 <span className="text-[var(--border-soft)]">·</span>
                 <div className="text-center">
                   <span className="text-[var(--text-muted)]">Portfolio </span>
-                  <span className="font-semibold text-[var(--blue-bright)] tabular-nums">
+                  <span className="font-semibold text-[var(--accent-primary)] tabular-nums">
                     {balanceLoading ? '—' : `${portfolio}`}
                   </span>
                 </div>
               </div>
             )}
 
-            <WalletButton />
+            <div className="flex items-center gap-2">
+              {me?.user?.xAvatarUrl && (
+                <img
+                  src={me.user.xAvatarUrl}
+                  alt="X avatar"
+                  className="h-7 w-7 rounded-full object-cover border border-[var(--border-soft)]"
+                />
+              )}
+              <WalletButton />
+            </div>
           </div>
 
           {/* X status row */}
@@ -152,6 +182,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <span>@{me.user.xUsername}</span>
               <span className="h-1 w-1 rounded-full bg-[var(--xen-green)]" />
               <span className="text-[var(--xen-green)]">X connected</span>
+              {me.user.xFollowerCount != null && (
+                <>
+                  <span className="h-1 w-1 rounded-full bg-[var(--border-soft)]" />
+                  <span>{me.user.xFollowerCount.toLocaleString()} followers</span>
+                </>
+              )}
             </div>
           )}
         </header>
@@ -171,13 +207,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 className={cn(
                   'flex-1 flex flex-col items-center justify-center py-2.5 gap-0.5 transition-colors',
                   isActive(n.href)
-                    ? 'text-[var(--blue-bright)]'
+                    ? 'text-[var(--accent-primary)]'
                     : 'text-[var(--text-muted)]'
                 )}
               >
                 <span className="text-[11px] font-medium tracking-wide">{n.label}</span>
                 {isActive(n.href) && (
-                  <span className="h-[2px] w-4 rounded-full bg-[var(--blue-bright)]" />
+                  <span className="h-[2px] w-4 rounded-full bg-[var(--accent-primary)]" />
                 )}
               </Link>
             ))}

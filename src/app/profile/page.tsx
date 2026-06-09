@@ -1,6 +1,6 @@
 'use client'
 import Link from 'next/link'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAccount } from 'wagmi'
 import { AppShell } from '@/components/layout/AppShell'
 import { Button } from '@/components/ui/button'
@@ -17,6 +17,7 @@ function formatDate(iso: string | null) {
 
 export default function ProfilePage() {
   const { address, isConnected } = useAccount()
+  const queryClient = useQueryClient()
 
   const { data: meData } = useQuery({
     queryKey: ['me'],
@@ -24,6 +25,11 @@ export default function ProfilePage() {
     staleTime: 60_000,
   })
   const user = meData?.user
+
+  async function handleDisconnectX() {
+    await fetch('/api/auth/x', { method: 'DELETE' })
+    queryClient.invalidateQueries({ queryKey: ['me'] })
+  }
 
   return (
     <AppShell>
@@ -34,13 +40,31 @@ export default function ProfilePage() {
         {/* Profile header */}
         <div className="bg-[var(--bg-elevated)] rounded-[20px] p-5 border border-[var(--border-soft)] mb-3">
           <div className="flex items-start justify-between mb-3">
-            <div>
-              <p className="text-[20px] font-semibold text-[var(--text-primary)]">
-                {user?.xUsername ? `@${user.xUsername}` : 'No X connected'}
-              </p>
-              {address && (
-                <p className="text-[12px] text-[var(--text-muted)] font-mono mt-0.5">{truncateAddr(address)}</p>
+            <div className="flex items-center gap-3">
+              {user?.xAvatarUrl ? (
+                <img
+                  src={user.xAvatarUrl}
+                  alt="X avatar"
+                  className="h-12 w-12 rounded-full object-cover border border-[var(--border-soft)] shrink-0"
+                />
+              ) : (
+                <span className="h-12 w-12 rounded-full bg-[var(--bg-muted)] border border-[var(--border-soft)] shrink-0 flex items-center justify-center text-[20px] text-[var(--text-muted)]">
+                  {user?.xUsername ? user.xUsername[0].toUpperCase() : '?'}
+                </span>
               )}
+              <div>
+                <p className="text-[20px] font-semibold text-[var(--text-primary)]">
+                  {user?.xUsername ? `@${user.xUsername}` : 'No X connected'}
+                </p>
+                {address && (
+                  <p className="text-[12px] text-[var(--text-muted)] font-mono mt-0.5">{truncateAddr(address)}</p>
+                )}
+                {user?.xFollowerCount != null && (
+                  <p className="text-[11px] text-[var(--text-muted)] mt-0.5 tabular-nums">
+                    {user.xFollowerCount.toLocaleString()} followers
+                  </p>
+                )}
+              </div>
             </div>
 
             <div className="flex items-center gap-1.5 mt-1">
@@ -87,7 +111,12 @@ export default function ProfilePage() {
                   </p>
                 )}
               </div>
-              <Button variant="ghost" size="sm" className="text-[var(--xen-red)]/70 hover:text-[var(--xen-red)]">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-[var(--xen-red)]/70 hover:text-[var(--xen-red)]"
+                onClick={handleDisconnectX}
+              >
                 Disconnect
               </Button>
             </div>
@@ -126,7 +155,7 @@ export default function ProfilePage() {
           </div>
           <p className="text-[13px] text-[var(--text-muted)] leading-relaxed">
             Your created markets will appear here. Head to the{' '}
-            <Link href="/markets" className="text-[var(--blue-bright)] hover:underline">Markets page</Link>
+            <Link href="/markets" className="text-[var(--accent-primary)] hover:underline">Markets page</Link>
             {' '}to browse all open markets.
           </p>
         </div>

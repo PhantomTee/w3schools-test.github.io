@@ -8,24 +8,24 @@ const badgeVariants = cva(
     variants: {
       variant: {
         // Status
-        open:      'bg-[#22C55E]/10 text-[#22C55E] dark:bg-[#22C55E]/10 dark:text-[#22C55E]',
-        resolved:  'bg-[#3B82F6]/10 text-[#3B82F6]',
-        voided:    'bg-[#EF4444]/10 text-[#EF4444] dark:bg-[#EF4444]/10 dark:text-[#EF4444]',
-        ending:    'bg-[#F59E0B]/10 text-[#F59E0B] dark:bg-[#F59E0B]/10 dark:text-[#F59E0B]',
+        open:      'bg-[#10B981]/10 text-[#10B981]',
+        resolved:  'bg-[#34D399]/10 text-[#34D399]',
+        voided:    'bg-[#F87171]/10 text-[#F87171]',
+        ending:    'bg-[#FBBF24]/10 text-[#FBBF24]',
         cancelled: 'bg-[var(--bg-muted)] text-[var(--text-muted)]',
         // Neutral
         default:   'bg-[var(--bg-elevated)] text-[var(--text-secondary)] border border-[var(--border-soft)]',
         neutral:   'bg-[var(--bg-elevated)] text-[var(--text-muted)] border border-[var(--border-soft)]',
         // Colored
-        blue:      'bg-[#3B82F6]/10 text-[#3B82F6]',
-        green:     'bg-[#22C55E]/10 text-[#22C55E] dark:bg-[#22C55E]/10 dark:text-[#22C55E]',
-        amber:     'bg-[#F59E0B]/10 text-[#F59E0B]',
-        red:       'bg-[#EF4444]/10 text-[#EF4444] dark:bg-[#EF4444]/10 dark:text-[#EF4444]',
+        green:     'bg-[#10B981]/10 text-[#10B981]',
+        blue:      'bg-[#60A5FA]/10 text-[#60A5FA]',
+        amber:     'bg-[#FBBF24]/10 text-[#FBBF24]',
+        red:       'bg-[#F87171]/10 text-[#F87171]',
+        purple:    'bg-[#A78BFA]/10 text-[#A78BFA]',
         // Compat
         secondary:   'bg-[var(--bg-muted)] text-[var(--text-muted)]',
-        destructive: 'bg-[#EF4444]/10 text-[#EF4444]',
+        destructive: 'bg-[#F87171]/10 text-[#F87171]',
         outline:     'border border-[var(--border-soft)] text-[var(--text-secondary)]',
-        purple:      'bg-[#8B5CF6]/10 text-[#8B5CF6]',
       },
     },
     defaultVariants: { variant: 'default' },

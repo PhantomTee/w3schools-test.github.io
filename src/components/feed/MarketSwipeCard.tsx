@@ -72,7 +72,7 @@ export function MarketSwipeCard({
           'absolute inset-x-0 top-0 w-full transition-all duration-300',
           'rounded-[28px] overflow-hidden',
           'border border-[var(--border-soft)]',
-          isActive && 'border-[rgba(59,130,246,0.20)] shadow-[0_0_40px_rgba(59,130,246,0.12)]',
+          isActive && 'border-glow-green',
           isPeeking && 'pointer-events-none',
           className
         )}
@@ -89,10 +89,10 @@ export function MarketSwipeCard({
               <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/30 to-black/80" />
             </>
           ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-[#07111F] via-[#0B1220] to-[#05070B]">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#1A1A1A] via-[#242424] to-[#1A1A1A]">
               <div
-                className="absolute inset-0 opacity-[0.07]"
-                style={{ backgroundImage: 'radial-gradient(circle at 30% 50%, #2563EB 0%, transparent 60%)' }}
+                className="absolute inset-0 opacity-[0.08]"
+                style={{ backgroundImage: 'radial-gradient(circle at 30% 50%, #10B981 0%, transparent 60%)' }}
               />
             </div>
           )}
@@ -115,7 +115,7 @@ export function MarketSwipeCard({
 
         {/* Card body */}
         <div className="bg-[var(--bg-card)] px-5 pt-4 pb-5">
-          <h2 className="text-[18px] sm:text-[20px] font-semibold text-[var(--text-primary)] leading-snug mb-4 text-balance">
+          <h2 className="font-display text-[18px] sm:text-[20px] font-bold text-[var(--text-primary)] leading-snug mb-4 text-balance">
             What will this tweet&apos;s {market.metricType.replace('FINAL_', '').toLowerCase()} be in {market.durationHours}h?
           </h2>
 
@@ -157,8 +157,8 @@ export function MarketSwipeCard({
                     'w-full flex items-center justify-between px-3.5 py-2.5 rounded-[12px]',
                     'border transition-all duration-150 text-left',
                     isSelected
-                      ? 'border-[var(--border-active)] bg-[var(--blue-primary)]/[0.08] shadow-[0_0_12px_rgba(59,130,246,0.15)]'
-                      : 'border-[var(--border-soft)] bg-[var(--bg-elevated)] hover:border-[rgba(59,130,246,0.25)] hover:bg-[var(--bg-muted)]'
+                      ? 'border-[var(--border-active)] bg-[var(--accent-primary)]/[0.08] shadow-[0_0_12px_rgba(16,185,129,0.15)]'
+                      : 'border-[var(--border-soft)] bg-[var(--bg-elevated)] hover:border-[rgba(16,185,129,0.25)] hover:bg-[var(--bg-muted)]'
                   )}
                 >
                   <span className="text-[13px] font-medium text-[var(--text-primary)]">{range.label}</span>
@@ -166,7 +166,7 @@ export function MarketSwipeCard({
                     <span className="text-[var(--text-muted)]">{poolUsdc} USDC</span>
                     <span className={cn(
                       'font-semibold tabular-nums min-w-[32px] text-right',
-                      isSelected ? 'text-[var(--blue-bright)]' : 'text-[var(--text-secondary)]'
+                      isSelected ? 'text-[var(--accent-primary)]' : 'text-[var(--text-secondary)]'
                     )}>{payout}</span>
                   </div>
                 </button>

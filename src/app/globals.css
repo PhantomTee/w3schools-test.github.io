@@ -2,86 +2,91 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ─── Shadcn HSL tokens (dark default — overridden in light mode) ─────────── */
+/* ─── Shadcn HSL tokens ──────────────────────────────────────────────────── */
 :root {
-  --background:              220 38% 4%;
-  --foreground:              210 40% 98%;
-  --card:                    218 55% 9%;
-  --card-foreground:         210 40% 98%;
-  --popover:                 218 43% 10%;
-  --popover-foreground:      210 40% 98%;
-  --primary:                 221 83% 54%;
+  --background:              0 0% 10%;
+  --foreground:              0 0% 96%;
+  --card:                    0 0% 14%;
+  --card-foreground:         0 0% 96%;
+  --popover:                 0 0% 12%;
+  --popover-foreground:      0 0% 96%;
+  --primary:                 160 84% 39%;
   --primary-foreground:      0 0% 100%;
-  --secondary:               218 35% 14%;
-  --secondary-foreground:    215 19% 65%;
-  --muted:                   218 43% 11%;
-  --muted-foreground:        215 16% 47%;
-  --accent:                  218 35% 14%;
-  --accent-foreground:       210 40% 98%;
-  --destructive:             0 84% 60%;
+  --secondary:               0 0% 16%;
+  --secondary-foreground:    0 0% 64%;
+  --muted:                   0 0% 16%;
+  --muted-foreground:        0 0% 45%;
+  --accent:                  0 0% 16%;
+  --accent-foreground:       0 0% 96%;
+  --destructive:             0 72% 71%;
   --destructive-foreground:  0 0% 100%;
-  --border:                  218 25% 14%;
-  --input:                   218 43% 11%;
-  --ring:                    221 83% 54%;
-  --radius:                  0.75rem;
+  --border:                  0 0% 18%;
+  --input:                   0 0% 16%;
+  --ring:                    160 84% 39%;
+  --radius:                  0.5rem;
 
-  /* Xen design tokens — dark default */
-  --bg-base:        #05070B;
-  --bg-secondary:   #080D14;
-  --bg-navy:        #07111F;
-  --bg-card:        #0B1220;
-  --bg-elevated:    #101827;
-  --bg-panel:       #111827;
-  --bg-muted:       #151E2E;
-  --blue-primary:   #2563EB;
-  --blue-bright:    #3B82F6;
-  --blue-glow:      #60A5FA;
-  --blue-deep:      #1D4ED8;
-  --blue-pale:      #BFDBFE;
-  --text-primary:   #F8FAFC;
-  --text-secondary: #94A3B8;
-  --text-muted:     #64748B;
-  --border-soft:    rgba(255,255,255,0.06);
-  --border-active:  rgba(59,130,246,0.45);
-  --glow-blue:      rgba(59,130,246,0.35);
-  --xen-red:        #EF4444;
-  --xen-green:      #22C55E;
-  --xen-amber:      #F59E0B;
+  /* ── Xen design tokens — dark default (charcoal + emerald) ── */
+  --bg-base:        #1A1A1A;
+  --bg-secondary:   #1E1E1E;
+  --bg-card:        #242424;
+  --bg-elevated:    #2A2A2A;
+  --bg-panel:       #262626;
+  --bg-muted:       #303030;
+
+  --accent-primary: #10B981;
+  --accent-bright:  #34D399;
+  --accent-deep:    #059669;
+  --accent-glow:    rgba(16,185,129,0.30);
+  --accent-pale:    #D1FAE5;
+
+  --text-primary:   #F5F5F5;
+  --text-secondary: #A3A3A3;
+  --text-muted:     #737373;
+
+  --border-soft:    rgba(255,255,255,0.08);
+  --border-strong:  rgba(255,255,255,0.15);
+  --border-active:  rgba(16,185,129,0.50);
+
+  --xen-red:        #F87171;
+  --xen-green:      #34D399;
+  --xen-amber:      #FBBF24;
 }
 
 /* ─── Light theme overrides ──────────────────────────────────────────────── */
 :root:not(.dark) {
-  --background:              0 0% 100%;
-  --foreground:              222 84% 5%;
+  --background:              0 0% 98%;
+  --foreground:              0 0% 4%;
   --card:                    0 0% 100%;
-  --card-foreground:         222 84% 5%;
+  --card-foreground:         0 0% 4%;
   --popover:                 0 0% 100%;
-  --popover-foreground:      222 84% 5%;
-  --secondary:               210 40% 96%;
-  --secondary-foreground:    222 47% 11%;
-  --muted:                   210 40% 96%;
-  --muted-foreground:        215 16% 47%;
-  --accent:                  210 40% 96%;
-  --accent-foreground:       222 47% 11%;
-  --border:                  214 32% 91%;
-  --input:                   214 32% 91%;
+  --popover-foreground:      0 0% 4%;
+  --secondary:               0 0% 96%;
+  --secondary-foreground:    0 0% 32%;
+  --muted:                   0 0% 96%;
+  --muted-foreground:        0 0% 45%;
+  --accent:                  0 0% 96%;
+  --accent-foreground:       0 0% 4%;
+  --border:                  0 0% 88%;
+  --input:                   0 0% 88%;
 
-  --bg-base:        #FFFFFF;
-  --bg-secondary:   #F8FAFC;
-  --bg-navy:        #F1F5F9;
+  --bg-base:        #FAFAFA;
+  --bg-secondary:   #F4F4F5;
   --bg-card:        #FFFFFF;
-  --bg-elevated:    #F8FAFC;
-  --bg-panel:       #F1F5F9;
-  --bg-muted:       #E2E8F0;
-  --blue-pale:      #DBEAFE;
-  --text-primary:   #0F172A;
-  --text-secondary: #475569;
-  --text-muted:     #94A3B8;
-  --border-soft:    rgba(0,0,0,0.07);
-  --border-active:  rgba(37,99,235,0.45);
-  --glow-blue:      rgba(37,99,235,0.15);
+  --bg-elevated:    #F4F4F5;
+  --bg-panel:       #E4E4E7;
+  --bg-muted:       #D4D4D8;
+
+  --text-primary:   #0A0A0A;
+  --text-secondary: #525252;
+  --text-muted:     #A3A3A3;
+
+  --border-soft:    rgba(0,0,0,0.08);
+  --border-strong:  rgba(0,0,0,0.15);
+  --border-active:  rgba(5,150,105,0.50);
+
+  --accent-glow:    rgba(16,185,129,0.15);
   --xen-red:        #DC2626;
-  --xen-green:      #16A34A;
+  --xen-green:      #059669;
   --xen-amber:      #D97706;
 }
 
@@ -102,7 +107,13 @@
     transition: background-color 0.2s ease, color 0.2s ease;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1, h2, h3, h4 {
+    font-family: var(--font-display), 'Syne', sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+  }
+
+  h5, h6 {
     font-weight: 600;
     letter-spacing: -0.015em;
   }
@@ -111,14 +122,14 @@
 /* ─── Utility classes ────────────────────────────────────────────────────── */
 @layer utilities {
   /* Glow effects */
-  .glow-blue-xs { box-shadow: 0 0 20px var(--glow-blue); }
-  .glow-blue-sm { box-shadow: 0 0 30px var(--glow-blue); }
-  .glow-blue    { box-shadow: 0 0 40px var(--glow-blue); }
-  .glow-blue-lg { box-shadow: 0 0 60px var(--glow-blue); }
+  .glow-green-xs { box-shadow: 0 0 20px var(--accent-glow); }
+  .glow-green-sm { box-shadow: 0 0 30px var(--accent-glow); }
+  .glow-green    { box-shadow: 0 0 40px var(--accent-glow); }
+  .glow-green-lg { box-shadow: 0 0 60px var(--accent-glow); }
 
-  .border-glow-blue {
+  .border-glow-green {
     border-color: var(--border-active) !important;
-    box-shadow: 0 0 0 1px rgba(59,130,246,0.12), 0 0 24px rgba(59,130,246,0.08);
+    box-shadow: 0 0 0 1px rgba(16,185,129,0.10), 0 0 24px rgba(16,185,129,0.08);
   }
 
   /* Shimmer */
@@ -137,20 +148,21 @@
   /* Page background */
   .bg-page {
     background:
-      radial-gradient(ellipse 80% 30% at 50% -5%, rgba(37,99,235,0.06) 0%, transparent 70%),
+      radial-gradient(ellipse 80% 30% at 50% -5%, rgba(16,185,129,0.05) 0%, transparent 70%),
       var(--bg-base);
   }
 
   /* Text */
-  .text-balance { text-wrap: balance; }
-  .tabular-nums { font-variant-numeric: tabular-nums; }
+  .text-balance  { text-wrap: balance; }
+  .tabular-nums  { font-variant-numeric: tabular-nums; }
+  .font-display  { font-family: var(--font-display), 'Syne', sans-serif; }
 
   /* Scrollbar */
   .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   .hide-scrollbar::-webkit-scrollbar { display: none; }
 
   /* Progress bar */
-  .progress-blue {
-    background: linear-gradient(90deg, var(--blue-deep), var(--blue-bright));
+  .progress-green {
+    background: linear-gradient(90deg, var(--accent-deep), var(--accent-bright));
   }
 }

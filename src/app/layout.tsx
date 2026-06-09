@@ -1,12 +1,18 @@
 import type { Metadata } from 'next'
-import { Urbanist } from 'next/font/google'
+import { Syne, Inter } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
 
-const urbanist = Urbanist({
+const syne = Syne({
+  subsets:  ['latin'],
+  variable: '--font-display',
+  weight:   ['400', '600', '700', '800'],
+  display:  'swap',
+})
+
+const inter = Inter({
   subsets:  ['latin'],
   variable: '--font-sans',
-  weight:   ['400', '500', '600', '700'],
   display:  'swap',
 })
 
@@ -29,7 +35,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${urbanist.variable} font-sans min-h-screen`}>
+      <body className={`${syne.variable} ${inter.variable} font-sans min-h-screen`}>
         <Providers>{children}</Providers>
       </body>
     </html>
