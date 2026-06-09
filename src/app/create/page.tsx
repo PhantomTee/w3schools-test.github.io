@@ -94,23 +94,12 @@ export default function CreatePage() {
     }
   }
 
-  async function handleShareOnX() {
-    if (sharing || shared || !selectedMetric || !selectedDuration) return
-    setSharing(true)
+  function handleShareOnX() {
+    if (!selectedMetric || !selectedDuration) return
     const metric = selectedMetric.replace('FINAL_', '').toLowerCase()
     const text   = `Just created a prediction market on Xen: what will this tweet's ${metric} be in ${selectedDuration}h? xen.markets/market/${createdMarketId}`
-    try {
-      await fetch('/api/x/post', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ text }),
-      })
-      setShared(true)
-    } catch {
-      // silent — sharing is optional
-    } finally {
-      setSharing(false)
-    }
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank')
+    setShared(true)
   }
 
   async function handleCreate() {

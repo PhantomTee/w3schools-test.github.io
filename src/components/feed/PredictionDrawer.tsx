@@ -72,23 +72,11 @@ export function PredictionDrawer({
     }
   }
 
-  async function handleShareOnX() {
-    if (sharing || shared) return
-    setSharing(true)
-    const metric  = market.metricType.replace('FINAL_', '').toLowerCase()
-    const text    = `Just placed a prediction on Xen: "${range?.label}" for ${market.durationHours}h ${metric} — staked ${effectiveStake} USDC at ${impliedPayout.toFixed(1)}x. xen.markets`
-    try {
-      await fetch('/api/x/post', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ text }),
-      })
-      setShared(true)
-    } catch {
-      // silent — sharing is optional
-    } finally {
-      setSharing(false)
-    }
+  function handleShareOnX() {
+    const metric = market.metricType.replace('FINAL_', '').toLowerCase()
+    const text   = `Just placed a prediction on Xen: "${range?.label}" for ${market.durationHours}h ${metric} — staked ${effectiveStake} USDC at ${impliedPayout.toFixed(1)}x. xen.markets`
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank')
+    setShared(true)
   }
 
   return (

@@ -36,7 +36,7 @@ export function getOAuthUrl(state: string, codeChallenge: string): string {
     response_type:         'code',
     client_id:             CLIENT_ID,
     redirect_uri:          CALLBACK_URL,
-    scope:                 'tweet.read tweet.write users.read offline.access',
+    scope:                 'tweet.read users.read offline.access',
     state,
     code_challenge:        codeChallenge,
     code_challenge_method: 'S256',
