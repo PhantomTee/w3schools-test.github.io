@@ -1,10 +1,11 @@
 export function Footer() {
   return (
-    <footer className="border-t border-border/50 py-6 mt-12">
-      <div className="container mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-muted-foreground">
-        <p>© 2025 Xen. USDC-settled attention markets on Arc.</p>
-        <p className="text-xs max-w-xs text-center sm:text-right">
-          Xen uses X API metrics. Markets may void if data cannot be verified.
+    <footer className="border-t border-white/[0.05] py-8 mt-16">
+      <div className="container mx-auto px-5 max-w-6xl flex flex-col sm:flex-row items-center justify-between gap-4">
+        <p className="text-[14px] font-medium text-[#64748B]">Xen</p>
+        <p className="text-[12px] text-[#64748B] max-w-sm text-center sm:text-right leading-relaxed">
+          Participation involves financial risk. Xen uses X API public metrics.
+          Markets may void if data cannot be verified at settlement.
           Not financial advice.
         </p>
       </div>

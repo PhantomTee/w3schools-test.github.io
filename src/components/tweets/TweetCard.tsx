@@ -1,14 +1,12 @@
 'use client'
 import Link from 'next/link'
-import { Eye, Heart, Repeat2, MessageCircle, Clock, TrendingUp } from 'lucide-react'
-import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { formatCount, formatAge } from '@/lib/utils'
 import type { EligibleTweet } from '@/types/tweet'
 
 interface Props {
-  tweet:  EligibleTweet
+  tweet:             EligibleTweet
   showCreateButton?: boolean
 }
 
@@ -16,75 +14,67 @@ export function TweetCard({ tweet, showCreateButton = true }: Props) {
   const m = tweet.normalizedMetrics
 
   return (
-    <Card className={`transition-all ${tweet.eligible ? 'gradient-border hover:glow-purple' : 'opacity-60'}`}>
-      <CardContent className="p-4 space-y-3">
-        {/* Header */}
-        <div className="flex items-start justify-between gap-3">
-          <p className="text-sm leading-relaxed line-clamp-3 flex-1">{tweet.text}</p>
-          <div className="flex flex-col items-end gap-1 shrink-0">
-            {tweet.eligible ? (
-              <Badge variant="green" className="text-xs">Eligible</Badge>
-            ) : (
-              <Badge variant="red" className="text-xs">Not eligible</Badge>
-            )}
-            {tweet.activeMarketCount > 0 && (
-              <Badge variant="purple" className="text-xs">
-                {tweet.activeMarketCount} market{tweet.activeMarketCount > 1 ? 's' : ''}
-              </Badge>
-            )}
-          </div>
-        </div>
-
-        {/* Metrics row */}
-        <div className="flex items-center gap-4 text-xs text-muted-foreground">
-          {m.views != null ? (
-            <span className="flex items-center gap-1">
-              <Eye className="h-3.5 w-3.5" /> {formatCount(m.views)}
-            </span>
+    <div
+      className={`rounded-[24px] border p-5 transition-all ${
+        tweet.eligible
+          ? 'bg-[#0B1220] border-[rgba(59,130,246,0.18)] hover:border-[rgba(59,130,246,0.32)]'
+          : 'bg-[#080D14] border-white/[0.04] opacity-60'
+      }`}
+    >
+      <div className="flex items-start justify-between gap-3 mb-4">
+        <p className="text-[14px] leading-relaxed text-[#F8FAFC] line-clamp-3 flex-1">{tweet.text}</p>
+        <div className="shrink-0 flex flex-col items-end gap-1.5">
+          {tweet.eligible ? (
+            <Badge variant="green">Eligible</Badge>
           ) : (
-            <span className="flex items-center gap-1 text-amber-500">
-              <Eye className="h-3.5 w-3.5" /> no views data
-            </span>
+            <Badge variant="default">Ineligible</Badge>
           )}
-          <span className="flex items-center gap-1">
-            <Heart className="h-3.5 w-3.5" /> {formatCount(m.likes)}
-          </span>
-          <span className="flex items-center gap-1">
-            <Repeat2 className="h-3.5 w-3.5" /> {formatCount(m.reposts)}
-          </span>
-          <span className="flex items-center gap-1">
-            <MessageCircle className="h-3.5 w-3.5" /> {formatCount(m.replies)}
-          </span>
-          <span className="flex items-center gap-1 ml-auto">
-            <Clock className="h-3.5 w-3.5" /> {formatAge(tweet.created_at)}
-          </span>
+          {tweet.activeMarketCount > 0 && (
+            <Badge variant="blue">{tweet.activeMarketCount} market{tweet.activeMarketCount > 1 ? 's' : ''}</Badge>
+          )}
         </div>
+      </div>
 
-        {/* Eligibility note */}
-        {!tweet.eligible && tweet.eligibilityNote && (
-          <p className="text-xs text-muted-foreground italic">{tweet.eligibilityNote}</p>
-        )}
-
-        {/* Actions */}
-        {showCreateButton && tweet.eligible && tweet.activeMarketCount < 3 && (
-          <Link href={`/create/${tweet.id}`}>
-            <Button size="sm" variant="xen" className="w-full gap-2 mt-1">
-              <TrendingUp className="h-4 w-4" />
-              Create Market
-            </Button>
-          </Link>
-        )}
-        {showCreateButton && tweet.eligible && tweet.activeMarketCount >= 3 && (
-          <p className="text-xs text-center text-muted-foreground">Max 3 markets per tweet reached</p>
-        )}
-        {showCreateButton && tweet.activeMarketCount > 0 && (
-          <div className="flex justify-center">
-            <Link href={`/dashboard?tweet=${tweet.id}`} className="text-xs text-primary hover:underline">
-              View existing markets →
-            </Link>
+      <div className="grid grid-cols-4 gap-2 py-3 mb-3 border-y border-white/[0.05]">
+        {[
+          { label: 'Views',   value: m.views != null ? formatCount(m.views) : 'N/A' },
+          { label: 'Likes',   value: formatCount(m.likes) },
+          { label: 'Reposts', value: formatCount(m.reposts) },
+          { label: 'Replies', value: formatCount(m.replies) },
+        ].map(({ label, value }) => (
+          <div key={label} className="text-center">
+            <div className="text-[13px] font-semibold text-[#F8FAFC] tabular-nums">{value}</div>
+            <div className="text-[11px] text-[#64748B] mt-0.5">{label}</div>
           </div>
+        ))}
+      </div>
+
+      <div className="flex items-center justify-between mb-3 text-[13px]">
+        <span className="text-[#64748B]">Posted {formatAge(tweet.created_at)} ago</span>
+        {tweet.eligible && (
+          <span className="text-[#3B82F6]">Creation window open</span>
         )}
-      </CardContent>
-    </Card>
+      </div>
+
+      {!tweet.eligible && tweet.eligibilityNote && (
+        <p className="text-[13px] text-[#64748B] mb-3">{tweet.eligibilityNote}</p>
+      )}
+
+      {showCreateButton && tweet.eligible && tweet.activeMarketCount < 3 && (
+        <Link href={`/create/${tweet.id}`}>
+          <Button variant="xen" size="sm" className="w-full">Create Market</Button>
+        </Link>
+      )}
+      {showCreateButton && tweet.eligible && tweet.activeMarketCount >= 3 && (
+        <p className="text-[12px] text-center text-[#64748B]">Maximum 3 markets per tweet reached</p>
+      )}
+      {showCreateButton && tweet.activeMarketCount > 0 && tweet.eligible && (
+        <div className="mt-2 text-center">
+          <Link href={`/dashboard?tweet=${tweet.id}`} className="text-[12px] text-[#3B82F6] hover:text-[#60A5FA] transition-colors">
+            View existing markets
+          </Link>
+        </div>
+      )}
+    </div>
   )
 }

@@ -4,52 +4,69 @@
 
 @layer base {
   :root {
-    --background: 224 71% 4%;
-    --foreground: 213 31% 91%;
-    --card: 224 71% 6%;
-    --card-foreground: 213 31% 91%;
-    --popover: 224 71% 6%;
-    --popover-foreground: 213 31% 91%;
-    --primary: 263 70% 60%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 222 47% 11%;
-    --secondary-foreground: 213 31% 91%;
-    --muted: 223 47% 11%;
-    --muted-foreground: 215 20% 55%;
-    --accent: 222 47% 15%;
-    --accent-foreground: 213 31% 91%;
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 216 34% 17%;
-    --input: 216 34% 17%;
-    --ring: 263 70% 60%;
-    --radius: 0.75rem;
+    --background:              220 38% 4%;
+    --foreground:              210 40% 98%;
+    --card:                    218 55% 9%;
+    --card-foreground:         210 40% 98%;
+    --popover:                 218 43% 10%;
+    --popover-foreground:      210 40% 98%;
+    --primary:                 221 83% 54%;
+    --primary-foreground:      0 0% 100%;
+    --secondary:               218 35% 14%;
+    --secondary-foreground:    215 19% 65%;
+    --muted:                   218 43% 11%;
+    --muted-foreground:        215 16% 47%;
+    --accent:                  218 35% 14%;
+    --accent-foreground:       210 40% 98%;
+    --destructive:             0 84% 60%;
+    --destructive-foreground:  0 0% 100%;
+    --border:                  218 25% 14%;
+    --input:                   218 43% 11%;
+    --ring:                    221 83% 54%;
+    --radius:                  0.75rem;
   }
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
+  * { @apply border-border; }
   body {
-    @apply bg-background text-foreground antialiased;
+    background-color: #05070B;
+    color: #F8FAFC;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
   h1, h2, h3, h4, h5, h6 {
-    @apply font-semibold tracking-tight;
+    font-weight: 600;
+    letter-spacing: -0.015em;
   }
 }
 
 @layer utilities {
-  .glow-purple {
-    box-shadow: 0 0 20px rgba(124, 58, 237, 0.3);
+  .glow-blue-xs  { box-shadow: 0 0 20px rgba(59,130,246,0.08); }
+  .glow-blue-sm  { box-shadow: 0 0 30px rgba(59,130,246,0.12); }
+  .glow-blue     { box-shadow: 0 0 40px rgba(59,130,246,0.18); }
+  .glow-blue-lg  { box-shadow: 0 0 60px rgba(59,130,246,0.28); }
+
+  .border-glow-blue {
+    border-color: rgba(59,130,246,0.45) !important;
+    box-shadow: 0 0 0 1px rgba(59,130,246,0.12), 0 0 24px rgba(59,130,246,0.08);
   }
-  .glow-green {
-    box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+
+  .shimmer {
+    background: linear-gradient(90deg, #0B1220 25%, #101827 50%, #0B1220 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.6s infinite;
   }
-  .gradient-border {
-    background: linear-gradient(#0d1117, #0d1117) padding-box,
-                linear-gradient(135deg, #7c3aed, #3b82f6) border-box;
-    border: 1px solid transparent;
+
+  .animate-fade-in { animation: fade-in 0.25s ease-out; }
+
+  .bg-page {
+    background:
+      radial-gradient(ellipse 80% 30% at 50% -5%, rgba(37,99,235,0.06) 0%, transparent 70%),
+      #05070B;
   }
+
+  .text-balance    { text-wrap: balance; }
+  .tabular-nums    { font-variant-numeric: tabular-nums; }
 }

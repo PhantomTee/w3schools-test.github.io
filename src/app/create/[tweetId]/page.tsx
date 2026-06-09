@@ -3,19 +3,12 @@ import { useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { useAccount, useWriteContract, useReadContract } from 'wagmi'
-import { Header } from '@/components/layout/Header'
-import { Footer } from '@/components/layout/Footer'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { AppShell } from '@/components/layout/AppShell'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
-import {
-  Eye, Heart, Repeat2, MessageCircle, Clock, Zap,
-  AlertCircle, CheckCircle2, ArrowLeft, Loader2
-} from 'lucide-react'
-import { formatCount, formatAge, DURATION_OPTIONS, METRIC_OPTIONS, metricLabel, formatUSDC } from '@/lib/utils'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { formatCount, formatAge, DURATION_OPTIONS, METRIC_OPTIONS, metricLabel } from '@/lib/utils'
 import { CONTRACT_ADDRESSES, CREATION_FEE_RAW } from '@/config/contracts'
 import { ERC20_ABI, XEN_FACTORY_ABI } from '@/config/abi'
 import type { MetricType } from '@/types/market'
@@ -24,33 +17,30 @@ import Link from 'next/link'
 type Step = 'config' | 'generating' | 'review' | 'approving' | 'creating' | 'done' | 'error'
 
 export default function CreateMarketPage() {
-  const params  = useParams()
-  const router  = useRouter()
-  const tweetId = params.tweetId as string
+  const params   = useParams()
+  const router   = useRouter()
+  const tweetId  = params.tweetId as string
   const { address } = useAccount()
   const { writeContractAsync } = useWriteContract()
 
-  const [metric,   setMetric]   = useState<MetricType>('FINAL_VIEWS')
-  const [duration, setDuration] = useState<number>(3)
-  const [step,     setStep]     = useState<Step>('config')
-  const [design,   setDesign]   = useState<any>(null)
-  const [guardResult, setGuardResult] = useState<any>(null)
-  const [marketDbId,  setMarketDbId]  = useState<string>('')
-  const [onChainConfig, setOnChainConfig] = useState<any>(null)
-  const [signature,     setSignature]     = useState<string>('')
-  const [error,         setError]         = useState<string>('')
+  const [metric,          setMetric]          = useState<MetricType>('FINAL_VIEWS')
+  const [duration,        setDuration]        = useState<number>(3)
+  const [step,            setStep]            = useState<Step>('config')
+  const [design,          setDesign]          = useState<any>(null)
+  const [guardResult,     setGuardResult]     = useState<any>(null)
+  const [marketDbId,      setMarketDbId]      = useState<string>('')
+  const [onChainConfig,   setOnChainConfig]   = useState<any>(null)
+  const [signature,       setSignature]       = useState<string>('')
+  const [error,           setError]           = useState<string>('')
   const [createdMarketId, setCreatedMarketId] = useState<string>('')
 
-  // Fetch tweet info
   const { data: tweetData, isLoading: tweetLoading } = useQuery({
     queryKey: ['tweet', tweetId],
     queryFn:  () => fetch(`/api/tweets/${tweetId}`).then(r => r.json()),
     enabled:  !!tweetId,
   })
-
   const tweet = tweetData?.tweet
 
-  // Read USDC allowance
   const { data: allowance } = useReadContract({
     address:      CONTRACT_ADDRESSES.USDC,
     abi:          ERC20_ABI,
@@ -72,7 +62,6 @@ export default function CreateMarketPage() {
       if (!res.ok) throw new Error(data.error ?? 'Design failed')
       setDesign(data.design)
 
-      // Also run guard
       const guardRes = await fetch('/api/genlayer/guard', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -95,9 +84,7 @@ export default function CreateMarketPage() {
   async function handleCreate() {
     if (!onChainConfig || !design || !address) return
     setError('')
-
     try {
-      // Approve USDC if needed
       if ((allowance ?? 0n) < CREATION_FEE_RAW) {
         setStep('approving')
         await writeContractAsync({
@@ -107,9 +94,7 @@ export default function CreateMarketPage() {
           args:         [CONTRACT_ADDRESSES.XEN_FACTORY, CREATION_FEE_RAW],
         })
       }
-
       setStep('creating')
-
       const configTuple = {
         creator:            onChainConfig.creator,
         xUserIdHash:        onChainConfig.xUserIdHash,
@@ -124,7 +109,6 @@ export default function CreateMarketPage() {
         genLayerReportHash: onChainConfig.genLayerReportHash,
         nonce:              BigInt(onChainConfig.nonce),
       }
-
       const ranges = design.ranges.map((r: any) => ({
         min:        BigInt(r.min),
         max:        r.max != null ? BigInt(r.max) : 0n,
@@ -132,22 +116,17 @@ export default function CreateMarketPage() {
         label:      r.label,
         difficulty: r.difficulty,
       }))
-
       const txHash = await writeContractAsync({
         address:      CONTRACT_ADDRESSES.XEN_FACTORY,
         abi:          XEN_FACTORY_ABI,
         functionName: 'createMarket',
         args:         [configTuple, ranges, signature as `0x${string}`],
       })
-
-      // Record in DB
-      // (We parse chainMarketId from tx receipt in a real integration; use 0 as placeholder)
       await fetch('/api/markets', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ marketDbId, chainMarketId: '0', contractAddress: '0x0', txHash }),
       })
-
       setCreatedMarketId(marketDbId)
       setStep('done')
     } catch (e) {
@@ -157,215 +136,232 @@ export default function CreateMarketPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-1 container mx-auto max-w-2xl px-4 py-8 space-y-6">
+    <AppShell>
+      <div className="px-5 sm:px-8 py-8 max-w-2xl mx-auto space-y-6">
+
+        {/* Back */}
         <div className="flex items-center gap-3">
-          <Link href="/profile">
-            <Button variant="ghost" size="sm" className="gap-1.5">
-              <ArrowLeft className="h-4 w-4" /> Back
-            </Button>
+          <Link href="/profile" className="text-[13px] text-[#64748B] hover:text-[#94A3B8] transition-colors">
+            Profile
           </Link>
-          <div>
-            <h1 className="text-xl font-bold">Create Market</h1>
-            <p className="text-sm text-muted-foreground">GenLayer designs fair ranges for your tweet</p>
-          </div>
+          <span className="text-[#64748B]">/</span>
+          <span className="text-[13px] text-[#94A3B8]">Create Market</span>
+        </div>
+
+        <div>
+          <h1 className="text-[24px] font-semibold text-[#F8FAFC] tracking-tight mb-1">Create Market</h1>
+          <p className="text-[14px] text-[#64748B]">GenLayer designs fair, time-aware ranges for your tweet</p>
         </div>
 
         {/* Tweet preview */}
         {tweetLoading ? (
-          <div className="h-32 rounded-xl bg-card animate-pulse" />
+          <div className="h-36 rounded-[24px] shimmer" />
         ) : tweet ? (
-          <Card className="gradient-border">
-            <CardContent className="p-4 space-y-3">
-              <p className="text-sm leading-relaxed">{tweet.text}</p>
-              <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                {tweet.normalizedMetrics?.views != null ? (
-                  <span className="flex items-center gap-1">
-                    <Eye className="h-3.5 w-3.5" /> {formatCount(tweet.normalizedMetrics.views)} views
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-1 text-amber-500">
-                    <Eye className="h-3.5 w-3.5" /> views unavailable
-                  </span>
-                )}
-                <span className="flex items-center gap-1"><Heart className="h-3.5 w-3.5" /> {formatCount(tweet.normalizedMetrics?.likes ?? 0)}</span>
-                <span className="flex items-center gap-1"><Repeat2 className="h-3.5 w-3.5" /> {formatCount(tweet.normalizedMetrics?.reposts ?? 0)}</span>
-                <span className="flex items-center gap-1"><MessageCircle className="h-3.5 w-3.5" /> {formatCount(tweet.normalizedMetrics?.replies ?? 0)}</span>
-                <span className="flex items-center gap-1 ml-auto"><Clock className="h-3.5 w-3.5" /> {formatAge(tweet.created_at)}</span>
-              </div>
-              {!tweet.eligible && (
-                <div className="flex items-center gap-2 text-red-400 text-xs">
-                  <AlertCircle className="h-3.5 w-3.5" /> {tweet.eligibilityNote}
+          <div className={`rounded-[24px] border p-5 ${tweet.eligible ? 'bg-[#0B1220] border-[rgba(59,130,246,0.18)]' : 'bg-[#080D14] border-white/[0.04]'}`}>
+            <p className="text-[14px] leading-relaxed text-[#F8FAFC] mb-4">{tweet.text}</p>
+            <div className="grid grid-cols-4 gap-3 py-3 border-y border-white/[0.05] mb-3">
+              {[
+                { label: 'Views',   value: tweet.normalizedMetrics?.views != null ? formatCount(tweet.normalizedMetrics.views) : 'N/A' },
+                { label: 'Likes',   value: formatCount(tweet.normalizedMetrics?.likes ?? 0) },
+                { label: 'Reposts', value: formatCount(tweet.normalizedMetrics?.reposts ?? 0) },
+                { label: 'Replies', value: formatCount(tweet.normalizedMetrics?.replies ?? 0) },
+              ].map(({ label, value }) => (
+                <div key={label} className="text-center">
+                  <p className="text-[13px] font-semibold text-[#F8FAFC] tabular-nums">{value}</p>
+                  <p className="text-[11px] text-[#64748B] mt-0.5">{label}</p>
                 </div>
+              ))}
+            </div>
+            <div className="flex items-center justify-between text-[13px]">
+              <span className="text-[#64748B]">Posted {formatAge(tweet.created_at)} ago</span>
+              {tweet.eligible ? (
+                <span className="text-[#22C55E]">Eligible</span>
+              ) : (
+                <span className="text-[#EF4444]">{tweet.eligibilityNote}</span>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         ) : null}
 
-        {/* Config */}
+        {/* Step 1: Configuration */}
         {(step === 'config' || step === 'error') && tweet?.eligible && (
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base">Market configuration</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Metric</Label>
-                  <Select value={metric} onValueChange={v => setMetric(v as MetricType)}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {METRIC_OPTIONS.filter(o => o.available).map(o => (
-                        <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Duration</Label>
-                  <Select value={String(duration)} onValueChange={v => setDuration(Number(v))}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {DURATION_OPTIONS.map(o => (
-                        <SelectItem key={o.value} value={String(o.value)}>{o.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+          <div className="rounded-[24px] bg-[#0B1220] border border-white/[0.06] p-6 space-y-5">
+            <h2 className="text-[16px] font-semibold text-[#F8FAFC]">Market configuration</h2>
 
-              {step === 'error' && error && (
-                <div className="flex items-start gap-2 text-red-400 text-sm p-3 bg-red-900/20 rounded-lg">
-                  <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
-                  <span>{error}</span>
-                </div>
-              )}
-
-              <div className="flex items-center justify-between pt-2">
-                <p className="text-sm text-muted-foreground">Creation fee: <strong>0.5 USDC</strong></p>
-                <Button variant="xen" onClick={handleGenerate} disabled={!address} className="gap-2">
-                  <Zap className="h-4 w-4" /> Generate with GenLayer
-                </Button>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-[12px] text-[#64748B]">Metric</Label>
+                <Select value={metric} onValueChange={v => setMetric(v as MetricType)}>
+                  <SelectTrigger className="bg-[#080D14] border-white/[0.08] text-[#F8FAFC] rounded-[12px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#0B1220] border-white/[0.08] rounded-[16px]">
+                    {METRIC_OPTIONS.filter(o => o.available).map(o => (
+                      <SelectItem key={o.value} value={o.value} className="text-[#F8FAFC] focus:bg-white/[0.06]">
+                        {o.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-              {!address && <p className="text-xs text-muted-foreground">Connect wallet to create markets</p>}
-            </CardContent>
-          </Card>
+              <div className="space-y-2">
+                <Label className="text-[12px] text-[#64748B]">Duration</Label>
+                <Select value={String(duration)} onValueChange={v => setDuration(Number(v))}>
+                  <SelectTrigger className="bg-[#080D14] border-white/[0.08] text-[#F8FAFC] rounded-[12px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#0B1220] border-white/[0.08] rounded-[16px]">
+                    {DURATION_OPTIONS.map(o => (
+                      <SelectItem key={o.value} value={String(o.value)} className="text-[#F8FAFC] focus:bg-white/[0.06]">
+                        {o.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {step === 'error' && error && (
+              <p className="text-[13px] text-[#EF4444] bg-[#EF4444]/[0.08] rounded-[12px] p-4">{error}</p>
+            )}
+
+            <div className="flex items-center justify-between pt-2 border-t border-white/[0.05]">
+              <div>
+                <p className="text-[13px] text-[#64748B]">Creation fee</p>
+                <p className="text-[15px] font-semibold text-[#F8FAFC]">0.5 USDC</p>
+              </div>
+              <Button variant="xen" onClick={handleGenerate} disabled={!address}>
+                Generate Ranges with GenLayer
+              </Button>
+            </div>
+            {!address && (
+              <p className="text-[12px] text-[#64748B]">Connect your wallet to create markets</p>
+            )}
+          </div>
         )}
 
-        {/* Generating */}
+        {/* Step 2: Generating */}
         {step === 'generating' && (
-          <Card>
-            <CardContent className="p-8 text-center space-y-3">
-              <Loader2 className="h-8 w-8 mx-auto animate-spin text-primary" />
-              <p className="font-medium">GenLayer designing ranges…</p>
-              <p className="text-sm text-muted-foreground">Analysing tweet velocity, age, and selected duration.</p>
-            </CardContent>
-          </Card>
+          <div className="rounded-[24px] bg-[#0B1220] border border-white/[0.06] p-10 text-center space-y-3">
+            <div className="w-full h-[2px] bg-[#101827] rounded-full overflow-hidden mb-6">
+              <div className="h-full bg-gradient-to-r from-transparent via-[#3B82F6] to-transparent animate-[shimmer_1.6s_infinite] w-1/2" />
+            </div>
+            <p className="text-[16px] font-semibold text-[#F8FAFC]">GenLayer is designing time-aware ranges</p>
+            <p className="text-[13px] text-[#64748B]">Analysing tweet velocity, age, and selected duration.</p>
+          </div>
         )}
 
-        {/* Review + create */}
+        {/* Step 3: Review */}
         {step === 'review' && design && (
           <div className="space-y-4">
-            <Card className="gradient-border">
-              <CardHeader className="pb-2">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-base">GenLayer market design</CardTitle>
-                  <Badge variant={guardResult?.approved ? 'green' : 'red'}>
-                    {guardResult?.approved ? 'Approved' : 'Rejected'}
-                  </Badge>
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">{design.reason}</p>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="grid grid-cols-3 gap-3 text-xs">
-                  <div className="p-2 rounded bg-accent/30 text-center">
-                    <div className="font-medium">{metricLabel(metric)}</div>
-                    <div className="text-muted-foreground">metric</div>
-                  </div>
-                  <div className="p-2 rounded bg-accent/30 text-center">
-                    <div className="font-medium">{design.durationHours}h</div>
-                    <div className="text-muted-foreground">duration</div>
-                  </div>
-                  <div className="p-2 rounded bg-accent/30 text-center">
-                    <div className="font-medium">{formatCount(design.startValue)}</div>
-                    <div className="text-muted-foreground">start value</div>
-                  </div>
-                </div>
+            <div className="rounded-[24px] bg-[#0B1220] border border-white/[0.06] p-6 space-y-5">
+              <div className="flex items-center justify-between">
+                <h2 className="text-[16px] font-semibold text-[#F8FAFC]">GenLayer market design</h2>
+                <Badge variant={guardResult?.approved ? 'green' : 'red'}>
+                  {guardResult?.approved ? 'Approved' : 'Rejected'}
+                </Badge>
+              </div>
 
-                <div className="space-y-2">
-                  <Label className="text-xs text-muted-foreground uppercase">Ranges</Label>
-                  {design.ranges.map((r: any, i: number) => (
-                    <div key={i} className="flex items-center justify-between p-2 rounded border border-border text-sm">
-                      <span className="font-mono">{r.label}</span>
-                      <div className="flex items-center gap-2">
-                        <Progress value={r.difficulty * 10} className="w-16 h-1.5" />
-                        <span className="text-xs text-muted-foreground">diff {r.difficulty}/10</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <p className="text-xs text-muted-foreground bg-accent/20 rounded p-2">
-                  Question: &quot;What will this tweet&apos;s final total {metricLabel(metric).toLowerCase()} be after {duration} hour(s)?&quot;
+              {design.reason && (
+                <p className="text-[13px] text-[#64748B] leading-relaxed bg-[#080D14] rounded-[12px] p-4">
+                  {design.reason}
                 </p>
-              </CardContent>
-            </Card>
+              )}
+
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { label: 'Metric',   value: metricLabel(metric) },
+                  { label: 'Duration', value: `${design.durationHours}h` },
+                  { label: 'Start',    value: formatCount(design.startValue) },
+                ].map(({ label, value }) => (
+                  <div key={label} className="p-3 rounded-[12px] bg-[#080D14] text-center">
+                    <p className="text-[13px] font-semibold text-[#F8FAFC]">{value}</p>
+                    <p className="text-[11px] text-[#64748B] mt-0.5">{label}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="space-y-2">
+                <p className="text-[12px] text-[#64748B] uppercase tracking-wider mb-3">Generated ranges</p>
+                {design.ranges.map((r: any, i: number) => (
+                  <div key={i} className="flex items-center justify-between p-3 rounded-[12px] border border-white/[0.05] bg-[#080D14]">
+                    <span className="text-[14px] font-medium text-[#F8FAFC]">{r.label}</span>
+                    <div className="flex items-center gap-3">
+                      <div className="w-16 h-[3px] rounded-full bg-white/[0.06] overflow-hidden">
+                        <div className="h-full rounded-full bg-[#2563EB]/50" style={{ width: `${r.difficulty * 10}%` }} />
+                      </div>
+                      <span className="text-[12px] text-[#64748B] w-16 text-right">
+                        Difficulty {r.difficulty}/10
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/[0.05] text-[13px]">
+                <div>
+                  <p className="text-[12px] text-[#64748B] mb-1">Market quality</p>
+                  <p className="text-[#F8FAFC] font-medium">{design.qualityScore >= 7 ? 'High' : design.qualityScore >= 4 ? 'Medium' : 'Low'}</p>
+                </div>
+                <div>
+                  <p className="text-[12px] text-[#64748B] mb-1">Manipulation risk</p>
+                  <p className="text-[#F8FAFC] font-medium">{design.riskScore <= 3 ? 'Low' : design.riskScore <= 6 ? 'Medium' : 'High'}</p>
+                </div>
+              </div>
+
+              <div className="rounded-[12px] bg-[#080D14] p-4 text-[13px] text-[#64748B]">
+                <span className="text-[#94A3B8]">Question: </span>
+                "What will this tweet's final total {metricLabel(metric).toLowerCase()} be after {duration} hour{duration !== 1 ? 's' : ''}?"
+              </div>
+            </div>
 
             <div className="flex items-center justify-between">
-              <div className="text-sm text-muted-foreground">
-                Cost: <strong>0.5 USDC</strong> creation fee
+              <div>
+                <p className="text-[12px] text-[#64748B]">Creation fee</p>
+                <p className="text-[15px] font-semibold text-[#F8FAFC]">0.5 USDC</p>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-3">
                 <Button variant="outline" onClick={() => setStep('config')}>Back</Button>
-                <Button variant="xen" onClick={handleCreate} className="gap-2">
-                  {(allowance ?? 0n) < CREATION_FEE_RAW ? 'Approve & Create Market' : 'Create Market'}
+                <Button variant="xen" onClick={handleCreate}>
+                  {(allowance ?? 0n) < CREATION_FEE_RAW ? 'Approve and Create Market' : 'Create Market'}
                 </Button>
               </div>
             </div>
           </div>
         )}
 
-        {/* Approving / creating */}
+        {/* Step 4: Approving / creating */}
         {(step === 'approving' || step === 'creating') && (
-          <Card>
-            <CardContent className="p-8 text-center space-y-3">
-              <Loader2 className="h-8 w-8 mx-auto animate-spin text-primary" />
-              <p className="font-medium">
-                {step === 'approving' ? 'Approving USDC…' : 'Creating market on Arc…'}
-              </p>
-              <p className="text-sm text-muted-foreground">Confirm the transaction in your wallet.</p>
-            </CardContent>
-          </Card>
+          <div className="rounded-[24px] bg-[#0B1220] border border-white/[0.06] p-10 text-center space-y-3">
+            <div className="w-full h-[2px] bg-[#101827] rounded-full overflow-hidden mb-6">
+              <div className="h-full bg-gradient-to-r from-transparent via-[#3B82F6] to-transparent animate-[shimmer_1.6s_infinite] w-1/2" />
+            </div>
+            <p className="text-[16px] font-semibold text-[#F8FAFC]">
+              {step === 'approving' ? 'Approving USDC...' : 'Creating market on Arc...'}
+            </p>
+            <p className="text-[13px] text-[#64748B]">Confirm the transaction in your wallet.</p>
+          </div>
         )}
 
-        {/* Done */}
+        {/* Step 5: Done */}
         {step === 'done' && (
-          <Card className="gradient-border glow-green">
-            <CardContent className="p-8 text-center space-y-4">
-              <CheckCircle2 className="h-12 w-12 mx-auto text-emerald-400" />
-              <h2 className="text-xl font-bold">Market created!</h2>
-              <p className="text-sm text-muted-foreground">
-                Your {metricLabel(metric)} prediction market is live for {duration} hour(s).
-                Traders can now stake USDC on ranges.
-              </p>
-              <div className="flex gap-3 justify-center">
-                <Link href={`/market/${createdMarketId}`}>
-                  <Button variant="xen">View Market</Button>
-                </Link>
-                <Link href="/profile">
-                  <Button variant="outline">Back to Profile</Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="rounded-[24px] bg-[#0B1220] border border-[rgba(34,197,94,0.25)] p-10 text-center space-y-4">
+            <div className="text-[40px] font-semibold text-[#22C55E] mb-2">Market created</div>
+            <p className="text-[14px] text-[#64748B]">
+              Your {metricLabel(metric)} prediction market is live for {duration} hour{duration !== 1 ? 's' : ''}.
+              Traders can now stake USDC on ranges.
+            </p>
+            <div className="flex gap-3 justify-center pt-2">
+              <Link href={`/market/${createdMarketId}`}>
+                <Button variant="xen">View Market</Button>
+              </Link>
+              <Link href="/profile">
+                <Button variant="outline">Back to Profile</Button>
+              </Link>
+            </div>
+          </div>
         )}
-      </main>
-      <Footer />
-    </div>
+      </div>
+    </AppShell>
   )
 }

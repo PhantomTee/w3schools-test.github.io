@@ -3,19 +3,19 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
 const badgeVariants = cva(
-  'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors',
+  'inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-medium transition-colors',
   {
     variants: {
       variant: {
-        default:     'border-transparent bg-primary text-primary-foreground',
-        secondary:   'border-transparent bg-secondary text-secondary-foreground',
-        destructive: 'border-transparent bg-destructive text-destructive-foreground',
-        outline:     'text-foreground',
-        green:       'border-transparent bg-emerald-900/60 text-emerald-400',
-        amber:       'border-transparent bg-amber-900/60 text-amber-400',
-        blue:        'border-transparent bg-blue-900/60 text-blue-400',
-        red:         'border-transparent bg-red-900/60 text-red-400',
-        purple:      'border-transparent bg-violet-900/60 text-violet-400',
+        default:     'bg-[#151E2E] text-[#94A3B8]',
+        outline:     'border border-white/[0.10] text-[#94A3B8]',
+        green:       'bg-[#22C55E]/10 text-[#22C55E]',
+        amber:       'bg-[#F59E0B]/10 text-[#F59E0B]',
+        blue:        'bg-[#3B82F6]/10 text-[#3B82F6]',
+        red:         'bg-[#EF4444]/10 text-[#EF4444]',
+        purple:      'bg-[#8B5CF6]/10 text-[#8B5CF6]',
+        secondary:   'bg-[#151E2E] text-[#64748B]',
+        destructive: 'bg-[#EF4444]/10 text-[#EF4444]',
       },
     },
     defaultVariants: { variant: 'default' },
