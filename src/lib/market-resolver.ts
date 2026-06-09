@@ -6,6 +6,7 @@ import { prisma } from './prisma'
 import { getTweetById, normalizeTweetMetrics } from './x-api'
 import { resolveDispute } from './genlayer'
 import { resolveMarketOnChain, voidMarketOnChain } from './arc-contracts'
+import { metricField } from './utils'
 import type { Market, Range } from '@/types/market'
 
 export async function attemptMarketResolution(market: Market): Promise<void> {
@@ -31,7 +32,11 @@ export async function attemptMarketResolution(market: Market): Promise<void> {
       await voidAndRecord(market, 'Tweet deleted or unavailable')
       return
     }
-    const metrics = normalizeTweetMetrics(tweet)
+    const metrics    = normalizeTweetMetrics(tweet)
+    const field      = metricField(market.metricType as Market['metricType'])
+    finalValue       = (metrics as unknown as Record<string, number | null>)[field.replace('_count', '').replace('impression', 'views')] ?? null
+
+    // Map back from normalisedMetrics fields
     if (market.metricType === 'FINAL_VIEWS')   finalValue = metrics.views
     if (market.metricType === 'FINAL_LIKES')   finalValue = metrics.likes
     if (market.metricType === 'FINAL_REPOSTS') finalValue = metrics.reposts

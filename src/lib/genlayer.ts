@@ -63,33 +63,52 @@ async function callAI(systemPrompt: string, userPrompt: string): Promise<string>
     throw new Error('Mock mode: use mock functions directly')
   }
 
-  if (process.env.GENLAYER_NODE_URL) {
-    return callGenLayerNode(systemPrompt, userPrompt)
+  if (process.env.OPENAI_API_KEY) {
+    return callOpenAI(systemPrompt, userPrompt)
+  }
+
+  throw new Error('No AI backend configured. Set OPENAI_API_KEY.')
+}
+
+async function callAIWithContract(fn: string, inputJson: string, systemPrompt: string, userPrompt: string): Promise<string> {
+  if (process.env.GENLAYER_MOCK_MODE === 'true') {
+    throw new Error('Mock mode: use mock functions directly')
+  }
+
+  // Prefer GenLayer Studionet intelligent contract when contract address is set
+  if (process.env.GENLAYER_CONTRACT_ADDRESS) {
+    try {
+      return await callGenLayerContract(fn, inputJson)
+    } catch {
+      // Fall through to OpenAI if GenLayer fails (e.g. not yet deployed)
+    }
   }
 
   if (process.env.OPENAI_API_KEY) {
     return callOpenAI(systemPrompt, userPrompt)
   }
 
-  throw new Error('No AI backend configured. Set GENLAYER_NODE_URL or OPENAI_API_KEY.')
+  throw new Error('No AI backend configured. Set GENLAYER_CONTRACT_ADDRESS or OPENAI_API_KEY.')
 }
 
-async function callGenLayerNode(system: string, user: string): Promise<string> {
-  const res = await fetch(`${process.env.GENLAYER_NODE_URL}/v1/chat/completions`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'intelligent-contract',
-      messages: [
-        { role: 'system', content: system },
-        { role: 'user',   content: user   },
-      ],
-      temperature: 0,
-    }),
+async function callGenLayerContract(fn: string, inputJson: string): Promise<string> {
+  // Dynamically import genlayer-js to avoid breaking SSR when not configured
+  const { createClient, chains } = await import('genlayer-js')
+  const studionet = chains.studionet
+  const contractAddress = process.env.GENLAYER_CONTRACT_ADDRESS as `0x${string}`
+  if (!contractAddress) throw new Error('GENLAYER_CONTRACT_ADDRESS not set')
+
+  const clientOpts: Record<string, unknown> = { chain: studionet }
+  if (process.env.GENLAYER_NODE_URL) clientOpts.endpoint = process.env.GENLAYER_NODE_URL
+
+  const client = createClient(clientOpts as any)
+  const result = await (client as any).readContract({
+    address:       contractAddress,
+    functionName:  fn,
+    args:          [inputJson],
+    stateStatus:   'accepted',
   })
-  if (!res.ok) throw new Error(`GenLayer node error: ${res.status}`)
-  const data = await res.json()
-  return data.choices[0].message.content
+  return typeof result === 'string' ? result : JSON.stringify(result)
 }
 
 async function callOpenAI(system: string, user: string): Promise<string> {
@@ -220,7 +239,7 @@ export async function designMarket(input: DesignInput): Promise<GenLayerDesignRe
 
   const userPrompt = JSON.stringify({
     tweet_id:          input.tweetId,
-    tweet_text:        input.tweetText.slice(0, 280),
+    tweet_text:        (input.tweetText ?? '').slice(0, 280),
     tweet_age_minutes: input.tweetAgeMinutes,
     selected_metric:   input.metricType,
     current_value:     currentValue,
@@ -250,7 +269,7 @@ export async function designMarket(input: DesignInput): Promise<GenLayerDesignRe
 
   let raw: string
   try {
-    raw = await callAI(DESIGNER_SYSTEM, userPrompt)
+    raw = await callAIWithContract('design_market', userPrompt, DESIGNER_SYSTEM, userPrompt)
   } catch (e) {
     throw new Error(`GenLayer Designer call failed: ${(e as Error).message}`)
   }
@@ -289,7 +308,7 @@ export async function guardMarket(input: GuardInput): Promise<GenLayerGuardRespo
 
   let raw: string
   try {
-    raw = await callAI(GUARD_SYSTEM, userPrompt)
+    raw = await callAIWithContract('guard_market', userPrompt, GUARD_SYSTEM, userPrompt)
   } catch (e) {
     throw new Error(`GenLayer Guard call failed: ${(e as Error).message}`)
   }
@@ -337,7 +356,7 @@ export async function resolveDispute(input: DisputeInput): Promise<GenLayerDispu
 
   let raw: string
   try {
-    raw = await callAI(DISPUTE_SYSTEM, userPrompt)
+    raw = await callAIWithContract('resolve_dispute', userPrompt, DISPUTE_SYSTEM, userPrompt)
   } catch (e) {
     throw new Error(`GenLayer Dispute call failed: ${(e as Error).message}`)
   }

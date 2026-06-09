@@ -9,8 +9,9 @@ export async function GET(
   const market = await prisma.market.findUnique({
     where:   { id: params.marketId },
     include: {
-      creator: { select: { xUsername: true, walletAddress: true } },
-      bets:    true,
+      creator:       { select: { xUsername: true, walletAddress: true } },
+      bets:          { orderBy: { createdAt: 'desc' } },
+      tweetSnapshot: { select: { text: true } },
     },
   })
 
@@ -34,6 +35,7 @@ export async function GET(
       creatorWallet:    market.creatorWallet,
       xUsername:        market.creator.xUsername,
       tweetId:          market.tweetId,
+      tweetText:        market.tweetSnapshot?.text ?? null,
       metricType:       market.metricType,
       startValue:       market.startValue.toString(),
       finalValue:       market.finalValue?.toString() ?? null,
@@ -46,7 +48,14 @@ export async function GET(
       totalStaked:      market.totalStaked.toString(),
       pools,
       userStakes,
-      genLayerReportHash: market.genLayerReportHash,
+      genLayerReportHash:   market.genLayerReportHash,
+      genLayerReport:       market.genLayerResponseJson ?? null,
+      recentBets:           market.bets.slice(0, 20).map(b => ({
+        walletAddress: b.walletAddress,
+        rangeIndex:    b.rangeIndex,
+        amount:        b.amount.toString(),
+        createdAt:     b.createdAt.toISOString(),
+      })),
     },
   })
 }

@@ -28,8 +28,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
-      <body className={`${urbanist.variable} font-sans min-h-screen bg-[#05070B] text-[#F8FAFC]`}>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${urbanist.variable} font-sans min-h-screen`}>
         <Providers>{children}</Providers>
       </body>
     </html>

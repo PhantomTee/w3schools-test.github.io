@@ -1,119 +1,155 @@
 'use client'
+
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { AppShell } from '@/components/layout/AppShell'
-import { MarketCard } from '@/components/markets/MarketCard'
+import { MarketListCard } from '@/components/markets/MarketListCard'
+import type { MarketWithPools } from '@/types/market'
 
-type Tab    = 'live' | 'ending' | 'resolved' | 'all'
+type Filter = 'all' | 'live' | 'ending' | 'resolved'
 type Metric = '' | 'FINAL_VIEWS' | 'FINAL_LIKES' | 'FINAL_REPOSTS' | 'FINAL_REPLIES'
 
-const TABS: { value: Tab; label: string }[] = [
-  { value: 'live',     label: 'Live'         },
-  { value: 'ending',   label: 'Ending soon'  },
-  { value: 'resolved', label: 'Resolved'     },
-  { value: 'all',      label: 'All'          },
+const FILTER_TABS: { label: string; value: Filter }[] = [
+  { label: 'All',         value: 'all' },
+  { label: 'Live',        value: 'live' },
+  { label: 'Ending Soon', value: 'ending' },
+  { label: 'Resolved',    value: 'resolved' },
 ]
 
-const METRICS: { value: Metric; label: string }[] = [
-  { value: '',               label: 'All metrics' },
-  { value: 'FINAL_VIEWS',    label: 'Final views'   },
-  { value: 'FINAL_LIKES',    label: 'Final likes'   },
-  { value: 'FINAL_REPOSTS',  label: 'Final reposts' },
-  { value: 'FINAL_REPLIES',  label: 'Final replies' },
+const METRIC_PILLS: { label: string; value: Metric }[] = [
+  { label: 'All',     value: '' },
+  { label: 'Views',   value: 'FINAL_VIEWS' },
+  { label: 'Likes',   value: 'FINAL_LIKES' },
+  { label: 'Reposts', value: 'FINAL_REPOSTS' },
+  { label: 'Replies', value: 'FINAL_REPLIES' },
 ]
+
+function SkeletonCard() {
+  return (
+    <div className="bg-[var(--bg-card)] border border-[var(--border-soft)] rounded-[20px] p-4 animate-pulse">
+      <div className="flex justify-between mb-3">
+        <div className="h-3 w-20 bg-[var(--bg-elevated)] rounded-full" />
+        <div className="h-5 w-14 bg-[var(--bg-elevated)] rounded-full" />
+      </div>
+      <div className="h-3 w-full bg-[var(--bg-elevated)] rounded-full mb-2" />
+      <div className="h-3 w-3/4 bg-[var(--bg-elevated)] rounded-full mb-4" />
+      <div className="h-4 w-2/3 bg-[var(--bg-elevated)] rounded-full mb-4" />
+      <div className="flex gap-3">
+        <div className="h-3 w-16 bg-[var(--bg-elevated)] rounded-full" />
+        <div className="h-3 w-12 bg-[var(--bg-elevated)] rounded-full" />
+        <div className="h-3 w-14 bg-[var(--bg-elevated)] rounded-full" />
+      </div>
+    </div>
+  )
+}
 
 export default function MarketsPage() {
-  const [tab,    setTab]    = useState<Tab>('live')
-  const [metric, setMetric] = useState<Metric>('')
-  const [search, setSearch] = useState('')
+  const [filter, setFilter]   = useState<Filter>('all')
+  const [metric, setMetric]   = useState<Metric>('')
+  const [search, setSearch]   = useState('')
 
-  const { data, isLoading } = useQuery({
-    queryKey:        ['markets', tab, metric],
-    queryFn:         () => fetch(`/api/markets?filter=${tab}${metric ? `&metric=${metric}` : ''}`).then(r => r.json()),
-    refetchInterval: 30_000,
+  const { data: markets, isLoading } = useQuery<MarketWithPools[]>({
+    queryKey: ['markets', filter, metric],
+    queryFn: async () => {
+      const params = new URLSearchParams({ filter })
+      if (metric) params.set('metric', metric)
+      const res = await fetch(`/api/markets?${params.toString()}`)
+      if (!res.ok) throw new Error('Failed to fetch markets')
+      return res.json()
+    },
   })
 
-  const markets: any[] = (data?.markets ?? []).filter((m: any) =>
-    !search ||
-    m.tweetId.includes(search) ||
-    (m.xUsername ?? '').toLowerCase().includes(search.toLowerCase())
-  )
+  const filtered = (markets ?? []).filter((m) => {
+    if (!search.trim()) return true
+    const q = search.toLowerCase()
+    return (
+      m.tweetText?.toLowerCase().includes(q) ||
+      m.xUsername?.toLowerCase().includes(q)
+    )
+  })
 
   return (
     <AppShell>
-      <div className="px-5 sm:px-8 py-8 max-w-5xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-[28px] font-semibold text-[#F8FAFC] tracking-tight mb-1">Markets</h1>
-          <p className="text-[14px] text-[#64748B]">USDC range prediction markets on tweet attention</p>
+      <div className="max-w-[900px] mx-auto px-4 pt-5 pb-8">
+
+        {/* Filter tabs */}
+        <div className="bg-[var(--bg-elevated)] rounded-[14px] p-1 flex gap-1 mb-3">
+          {FILTER_TABS.map((tab) => (
+            <button
+              key={tab.value}
+              onClick={() => setFilter(tab.value)}
+              className="flex-1 py-1.5 rounded-[10px] text-[13px] font-medium transition-all"
+              style={{
+                background:
+                  filter === tab.value
+                    ? 'linear-gradient(135deg, #2563EB, #3B82F6)'
+                    : 'transparent',
+                color:
+                  filter === tab.value
+                    ? '#fff'
+                    : 'var(--text-muted)',
+              }}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
 
-        {/* Filters row */}
-        <div className="flex flex-col sm:flex-row gap-3 mb-6">
-          {/* Tab pills */}
-          <div className="flex gap-1.5 flex-wrap">
-            {TABS.map(t => (
-              <button
-                key={t.value}
-                onClick={() => setTab(t.value)}
-                className={`px-3.5 py-1.5 rounded-full text-[13px] font-medium transition-all ${
-                  tab === t.value
-                    ? 'bg-[#2563EB] text-white'
-                    : 'bg-[#101827] text-[#64748B] hover:text-[#94A3B8] hover:bg-[#151E2E]'
-                }`}
-              >
-                {t.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Metric pills */}
-          <div className="flex gap-1.5 flex-wrap">
-            {METRICS.map(m => (
-              <button
-                key={m.value}
-                onClick={() => setMetric(m.value)}
-                className={`px-3.5 py-1.5 rounded-full text-[13px] font-medium transition-all ${
-                  metric === m.value
-                    ? 'bg-[#151E2E] text-[#BFDBFE] border border-[rgba(59,130,246,0.30)]'
-                    : 'bg-[#101827] text-[#64748B] hover:text-[#94A3B8] hover:bg-[#151E2E]'
-                }`}
-              >
-                {m.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Search */}
-          <div className="sm:ml-auto">
-            <input
-              type="text"
-              placeholder="Search by creator..."
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              className="w-full sm:w-48 h-8 px-3 rounded-[10px] bg-[#101827] border border-white/[0.08] text-[13px] text-[#F8FAFC] placeholder:text-[#64748B] focus:outline-none focus:border-[#3B82F6]/40"
-            />
-          </div>
+        {/* Metric pills */}
+        <div className="flex gap-2 overflow-x-auto pb-1 mb-3 scrollbar-none">
+          {METRIC_PILLS.map((pill) => (
+            <button
+              key={pill.value}
+              onClick={() => setMetric(pill.value)}
+              className="shrink-0 px-3 py-1.5 rounded-full text-[12px] font-medium transition-all border"
+              style={{
+                background:
+                  metric === pill.value
+                    ? 'linear-gradient(135deg, #2563EB, #3B82F6)'
+                    : 'transparent',
+                color:
+                  metric === pill.value
+                    ? '#fff'
+                    : 'var(--text-muted)',
+                borderColor:
+                  metric === pill.value
+                    ? 'transparent'
+                    : 'var(--border-soft)',
+              }}
+            >
+              {pill.label}
+            </button>
+          ))}
         </div>
 
-        {/* Market grid */}
+        {/* Search */}
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search markets..."
+          className="w-full bg-[var(--bg-elevated)] border border-[var(--border-soft)] rounded-[12px] px-4 py-2.5 text-[13px] outline-none focus:border-[var(--border-active)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] mb-5"
+        />
+
+        {/* Grid */}
         {isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="h-64 rounded-[24px] shimmer" />
-            ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard />
           </div>
-        ) : markets.length === 0 ? (
-          <div className="rounded-[24px] bg-[#080D14] border border-white/[0.04] py-16 text-center">
-            <p className="text-[15px] text-[#64748B] mb-2">No {tab === 'all' ? '' : tab} markets found.</p>
-            <p className="text-[13px] text-[#64748B]">
-              {tab === 'live'
-                ? 'Create a market from a fresh tweet or adjust your filters.'
-                : 'Try a different filter or check back later.'}
+        ) : filtered.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <p className="text-[var(--text-muted)] text-[14px]">
+              {search ? 'No markets match your search.' : 'No markets found.'}
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {markets.map((m: any) => <MarketCard key={m.id} market={m} />)}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {filtered.map((market) => (
+              <MarketListCard key={market.id} market={market} />
+            ))}
           </div>
         )}
       </div>

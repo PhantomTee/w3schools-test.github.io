@@ -1,269 +1,417 @@
 'use client'
+
 import { useParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { AppShell } from '@/components/layout/AppShell'
-import { BetForm } from '@/components/markets/BetForm'
-import { ClaimRefundButton } from '@/components/markets/ClaimRefundButton'
 import { Badge } from '@/components/ui/badge'
-import { formatCount, timeUntil, metricLabel } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import MarketChart from '@/components/market/MarketChart'
+import PredictionPanel from '@/components/market/PredictionPanel'
+import EvidencePanel from '@/components/market/EvidencePanel'
+import GenLayerPanel from '@/components/market/GenLayerPanel'
+import ActivityFeed from '@/components/market/ActivityFeed'
+import { cn } from '@/lib/utils'
 import Link from 'next/link'
-import type { Range } from '@/types/market'
 
-function stateVariant(state: string): 'green' | 'blue' | 'red' | 'amber' | 'default' {
-  if (state === 'OPEN')     return 'green'
-  if (state === 'RESOLVED') return 'blue'
-  if (state === 'VOIDED')   return 'red'
-  if (state === 'LOCKED')   return 'amber'
-  return 'default'
+/* ─── helpers ─────────────────────────────────────────────────────────────── */
+
+function StateBadge({ state }: { state: string }) {
+  const variantMap: Record<string, string> = {
+    OPEN: 'open',
+    LOCKED: 'ending',
+    RESOLVED: 'resolved',
+    VOIDED: 'voided',
+    CANCELLED: 'neutral',
+  }
+  const labelMap: Record<string, string> = {
+    OPEN: 'Open',
+    LOCKED: 'Locked',
+    RESOLVED: 'Resolved',
+    VOIDED: 'Voided',
+    CANCELLED: 'Cancelled',
+  }
+  return (
+    <Badge variant={variantMap[state] as any ?? 'neutral'}>
+      {labelMap[state] ?? state}
+    </Badge>
+  )
 }
+
+function timeLeft(expiresAt: string): string {
+  const diff = new Date(expiresAt).getTime() - Date.now()
+  if (diff <= 0) return 'Expired'
+  const h = Math.floor(diff / 3_600_000)
+  const m = Math.floor((diff % 3_600_000) / 60_000)
+  if (h > 0) return `${h}h ${m}m`
+  return `${m}m`
+}
+
+function formatMetric(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}k`
+  return String(n)
+}
+
+function metricLabel(metricType: string): string {
+  const map: Record<string, string> = {
+    FINAL_VIEWS: 'views',
+    FINAL_LIKES: 'likes',
+    FINAL_RETWEETS: 'retweets',
+    FINAL_REPLIES: 'replies',
+    FINAL_BOOKMARKS: 'bookmarks',
+  }
+  return map[metricType] ?? metricType.toLowerCase().replace('final_', '')
+}
+
+function formatUSDC(raw: string): string {
+  const n = Number(raw) / 1_000_000
+  if (n >= 1_000) return `$${(n / 1_000).toFixed(1)}k`
+  return `$${n.toFixed(2)}`
+}
+
+/* ─── range rows ──────────────────────────────────────────────────────────── */
+
+interface RangeRow {
+  min: number
+  max: number
+  maxOpen: boolean
+  label: string
+  difficulty?: number
+}
+
+function RangeRows({
+  ranges,
+  pools,
+  totalStaked,
+  winningRangeIndex,
+  state,
+}: {
+  ranges: RangeRow[]
+  pools: { rangeIndex: number; amount: string }[]
+  totalStaked: string
+  winningRangeIndex: number | null
+  state: string
+}) {
+  const total = Number(totalStaked) || 0
+
+  return (
+    <div className="flex flex-col gap-2">
+      {ranges.map((r, i) => {
+        const poolAmt = Number(pools.find(p => p.rangeIndex === i)?.amount ?? '0')
+        const pct = total > 0 ? (poolAmt / total) * 100 : 0
+        const poolUSDC = formatUSDC(String(poolAmt))
+        const payout = poolAmt > 0 && total > 0 ? (total / poolAmt).toFixed(2) : '—'
+        const isWinner = state === 'RESOLVED' && winningRangeIndex === i
+        const isResolved = state === 'RESOLVED'
+
+        return (
+          <div
+            key={i}
+            className={cn(
+              'flex items-center justify-between px-3 py-2.5 rounded-xl border transition-all',
+              isWinner
+                ? 'border-[var(--xen-green)]/40 bg-[var(--xen-green)]/5 text-[var(--xen-green)]'
+                : isResolved
+                ? 'border-[var(--border-soft)] opacity-50'
+                : 'border-[var(--border-soft)]'
+            )}
+          >
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium">{r.label}</span>
+              {isWinner && (
+                <span className="text-[10px] font-semibold uppercase tracking-wide opacity-80">
+                  Winner
+                </span>
+              )}
+            </div>
+            <div className="text-right">
+              <div className="text-xs font-medium">{poolUSDC}</div>
+              <div className="text-[10px] opacity-60">{pct.toFixed(0)}% · {payout}x</div>
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+/* ─── tweet preview card (desktop col 1) ─────────────────────────────────── */
+
+function TweetCard({ market }: { market: any }) {
+  return (
+    <div
+      style={{ background: 'var(--bg-elevated)', borderRadius: 20 }}
+      className="p-5 flex flex-col gap-3"
+    >
+      <div className="flex items-center gap-2">
+        <span style={{ color: 'var(--text-muted)', fontSize: 13, fontWeight: 500 }}>
+          {market.xUsername}
+        </span>
+        {market.tweetId && (
+          <a
+            href={`https://twitter.com/i/web/status/${market.tweetId}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: 'var(--blue-primary)', fontSize: 12 }}
+            className="ml-auto hover:underline"
+          >
+            View tweet ↗
+          </a>
+        )}
+      </div>
+      {market.tweetText && (
+        <p
+          style={{ color: 'var(--text-secondary)', fontSize: 14, lineHeight: 1.55 }}
+          className="italic"
+        >
+          {market.tweetText}
+        </p>
+      )}
+      <div className="flex items-center gap-4 pt-1">
+        <div>
+          <div style={{ color: 'var(--text-primary)', fontSize: 15, fontWeight: 600 }}>
+            {formatMetric(Number(market.startValue))}
+          </div>
+          <div style={{ color: 'var(--text-muted)', fontSize: 11 }}>start {metricLabel(market.metricType)}</div>
+        </div>
+        <div>
+          <div style={{ color: 'var(--text-primary)', fontSize: 15, fontWeight: 600 }}>
+            {market.durationHours}h
+          </div>
+          <div style={{ color: 'var(--text-muted)', fontSize: 11 }}>duration</div>
+        </div>
+        <div>
+          <div style={{ color: 'var(--text-primary)', fontSize: 15, fontWeight: 600 }}>
+            {formatUSDC(market.totalStaked)}
+          </div>
+          <div style={{ color: 'var(--text-muted)', fontSize: 11 }}>pool</div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ─── stats bar ──────────────────────────────────────────────────────────── */
+
+function StatsBar({ market }: { market: any }) {
+  const isOpen = market.state === 'OPEN'
+  return (
+    <div
+      style={{ background: 'var(--bg-elevated)', borderRadius: 12 }}
+      className="flex items-center divide-x divide-[var(--border-soft)] overflow-hidden"
+    >
+      <div className="flex-1 flex flex-col items-center py-2.5 px-3">
+        <span style={{ color: 'var(--text-primary)', fontSize: 14, fontWeight: 600 }}>
+          {formatMetric(Number(market.startValue))}
+        </span>
+        <span style={{ color: 'var(--text-muted)', fontSize: 10 }}>current</span>
+      </div>
+      <div className="flex-1 flex flex-col items-center py-2.5 px-3">
+        <span
+          style={{
+            fontSize: 14,
+            fontWeight: 600,
+            color: isOpen ? 'var(--xen-amber)' : 'var(--text-muted)',
+          }}
+        >
+          {isOpen ? timeLeft(market.expiresAt) : market.state}
+        </span>
+        <span style={{ color: 'var(--text-muted)', fontSize: 10 }}>time left</span>
+      </div>
+      <div className="flex-1 flex flex-col items-center py-2.5 px-3">
+        <span style={{ color: 'var(--text-primary)', fontSize: 14, fontWeight: 600 }}>
+          {formatUSDC(market.totalStaked)}
+        </span>
+        <span style={{ color: 'var(--text-muted)', fontSize: 10 }}>pool</span>
+      </div>
+    </div>
+  )
+}
+
+/* ─── page ────────────────────────────────────────────────────────────────── */
 
 export default function MarketPage() {
   const { marketId } = useParams()
 
   const { data, isLoading, error } = useQuery({
-    queryKey:        ['market', marketId],
-    queryFn:         () => fetch(`/api/markets/${marketId}`).then(r => r.json()),
+    queryKey: ['market', marketId],
+    queryFn: () => fetch(`/api/markets/${marketId}`).then(r => r.json()),
     refetchInterval: 15_000,
   })
 
-  const { data: meData } = useQuery({
-    queryKey: ['me'],
-    queryFn:  () => fetch('/api/auth/me').then(r => r.json()),
-  })
-  const me     = meData?.user
   const market = data?.market
 
+  /* loading */
   if (isLoading) {
     return (
       <AppShell>
-        <div className="px-5 sm:px-8 py-8 max-w-5xl mx-auto">
-          <div className="h-96 rounded-[24px] shimmer" />
+        <div className="max-w-[520px] mx-auto px-4 pt-6 pb-8 flex flex-col gap-4">
+          <div className="animate-pulse h-6 rounded-lg" style={{ background: 'var(--bg-elevated)' }} />
+          <div className="animate-pulse h-24 rounded-xl" style={{ background: 'var(--bg-elevated)' }} />
+          <div className="animate-pulse h-40 rounded-xl" style={{ background: 'var(--bg-elevated)' }} />
         </div>
       </AppShell>
     )
   }
 
+  /* error */
   if (error || !market) {
     return (
       <AppShell>
-        <div className="px-5 sm:px-8 py-16 max-w-2xl mx-auto text-center space-y-4">
-          <p className="text-[20px] font-semibold text-[#F8FAFC]">Market not found</p>
-          <Link href="/markets" className="text-[14px] text-[#3B82F6] hover:text-[#60A5FA] transition-colors">
-            Back to markets
+        <div className="flex flex-col items-center justify-center gap-4 py-24">
+          <p style={{ color: 'var(--text-muted)', fontSize: 16 }}>Market not found</p>
+          <Link href="/markets">
+            <Button variant="ghost" size="sm" style={{ color: 'var(--blue-primary)' }}>
+              ← Back to Markets
+            </Button>
           </Link>
         </div>
       </AppShell>
     )
   }
 
-  const ranges: Range[] = market.ranges as Range[]
-  const totalPool       = BigInt(market.totalStaked)
+  const isOpen = market.state === 'OPEN'
+
+  /* ── market question ── */
+  const question = `What will this tweet's ${metricLabel(market.metricType)} be in ${market.durationHours}h?`
 
   return (
     <AppShell>
-      <div className="px-5 sm:px-8 py-8 max-w-5xl mx-auto">
-        {/* Back link */}
-        <Link href="/markets" className="text-[13px] text-[#64748B] hover:text-[#94A3B8] transition-colors mb-6 block">
-          Markets
+      {/* ════════════════════════════════════════════════════════════
+          MOBILE  (single column, hidden on md+)
+      ════════════════════════════════════════════════════════════ */}
+      <div className="md:hidden max-w-[520px] mx-auto px-4 pt-4 pb-8 flex flex-col gap-4">
+        {/* back link */}
+        <Link
+          href="/markets"
+          style={{ color: 'var(--text-muted)', fontSize: 12 }}
+          className="hover:opacity-80 w-fit"
+        >
+          ← Markets
         </Link>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left: market info */}
-          <div className="lg:col-span-2 space-y-5">
-            {/* Header */}
-            <div className="rounded-[24px] bg-[#0B1220] border border-white/[0.06] p-6 space-y-4">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-[13px] text-[#64748B] mb-2">
-                    {market.xUsername ? `@${market.xUsername}` : 'Unknown creator'} ·{' '}
-                    <a
-                      href={`https://twitter.com/i/web/status/${market.tweetId}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="hover:text-[#94A3B8] transition-colors"
-                    >
-                      View tweet
-                    </a>
-                  </p>
-                  <h1 className="text-[20px] font-semibold text-[#F8FAFC]">
-                    What will the final total {metricLabel(market.metricType).toLowerCase()} be?
-                  </h1>
-                </div>
-                <Badge variant={stateVariant(market.state)}>{market.state}</Badge>
-              </div>
+        {/* status row */}
+        <div className="flex items-center gap-2">
+          <StateBadge state={market.state} />
+          <span
+            style={{
+              fontSize: 12,
+              color: isOpen ? 'var(--xen-amber)' : 'var(--text-muted)',
+            }}
+          >
+            {isOpen ? `${timeLeft(market.expiresAt)} left` : market.state.toLowerCase()}
+          </span>
+        </div>
 
-              <div className="flex flex-wrap gap-2 text-[13px]">
-                <span className="px-2.5 py-1 rounded-full bg-white/[0.04] text-[#94A3B8]">
-                  {market.durationHours}h market
-                </span>
-                <span className="px-2.5 py-1 rounded-full bg-white/[0.04] text-[#94A3B8]">
-                  {metricLabel(market.metricType)}
-                </span>
-                {market.state === 'OPEN' && (
-                  <span className="px-2.5 py-1 rounded-full bg-[#F59E0B]/10 text-[#F59E0B]">
-                    Ends in {timeUntil(market.expiresAt)}
-                  </span>
-                )}
-              </div>
+        {/* creator */}
+        <span style={{ color: 'var(--text-muted)', fontSize: 11 }}>{market.xUsername}</span>
 
-              <div className="grid grid-cols-3 gap-4 pt-4 border-t border-white/[0.05]">
-                <div>
-                  <p className="text-[12px] text-[#64748B] mb-1">Start value</p>
-                  <p className="text-[18px] font-semibold text-[#F8FAFC] tabular-nums">
-                    {formatCount(Number(market.startValue))}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-[12px] text-[#64748B] mb-1">USDC pool</p>
-                  <p className="text-[18px] font-semibold text-[#F8FAFC] tabular-nums">
-                    {(Number(market.totalStaked) / 1e6).toFixed(2)}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-[12px] text-[#64748B] mb-1">Ranges</p>
-                  <p className="text-[18px] font-semibold text-[#F8FAFC]">{ranges.length}</p>
-                </div>
-              </div>
-            </div>
+        {/* tweet preview */}
+        {market.tweetText && (
+          <p
+            style={{ color: 'var(--text-secondary)', fontSize: 13, lineHeight: 1.5 }}
+            className="italic line-clamp-3 -mt-2 mb-1"
+          >
+            {market.tweetText}
+          </p>
+        )}
 
-            {/* Pool distribution */}
-            <div className="rounded-[24px] bg-[#0B1220] border border-white/[0.06] p-6">
-              <h2 className="text-[16px] font-semibold text-[#F8FAFC] mb-5">Pool distribution</h2>
-              <div className="space-y-4">
-                {ranges.map((r, i) => {
-                  const pool    = BigInt(market.pools?.find((p: any) => p.rangeIndex === i)?.amount ?? '0')
-                  const pct     = totalPool > 0n ? Number((pool * 100n) / totalPool) : 0
-                  const display = (Number(pool) / 1e6).toFixed(2)
-                  const isWin   = market.state === 'RESOLVED' && market.winningRangeIndex === i
+        {/* market question */}
+        <h1
+          style={{ color: 'var(--text-primary)', fontSize: 20, fontWeight: 600, lineHeight: 1.3 }}
+          className="mb-1"
+        >
+          {question}
+        </h1>
 
-                  return (
-                    <div key={i} className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className={`text-[14px] font-medium ${isWin ? 'text-[#22C55E]' : 'text-[#F8FAFC]'}`}>
-                            {r.label}
-                          </span>
-                          {isWin && (
-                            <span className="text-[11px] px-2 py-0.5 rounded-full bg-[#22C55E]/10 text-[#22C55E]">
-                              Winner
-                            </span>
-                          )}
-                        </div>
-                        <span className="text-[13px] text-[#64748B] tabular-nums">
-                          {display} USDC · {pct}%
-                        </span>
-                      </div>
-                      <div className="h-[3px] rounded-full bg-white/[0.06] overflow-hidden">
-                        <div
-                          className={`h-full rounded-full transition-all ${isWin ? 'bg-[#22C55E]' : 'bg-[#2563EB]/50'}`}
-                          style={{ width: `${Math.max(pct, pct > 0 ? 2 : 0)}%` }}
-                        />
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
+        {/* stats bar */}
+        <StatsBar market={market} />
 
-            {/* Resolution result */}
-            {market.state === 'RESOLVED' && market.finalValue && (
-              <div className="rounded-[24px] bg-[#0B1220] border border-[rgba(34,197,94,0.25)] p-6 glow-blue-xs">
-                <div className="flex items-center gap-3 mb-2">
-                  <Badge variant="green">Resolved</Badge>
-                  <span className="text-[14px] text-[#94A3B8]">
-                    Final value: <span className="text-[#F8FAFC] font-semibold">{formatCount(Number(market.finalValue))}</span>
-                  </span>
-                </div>
-                <p className="text-[14px] text-[#64748B]">
-                  Winning range: <span className="text-[#F8FAFC] font-medium">{ranges[market.winningRangeIndex!]?.label ?? '—'}</span>
-                </p>
-              </div>
-            )}
+        {/* chart */}
+        <MarketChart market={market} />
 
-            {market.state === 'VOIDED' && (
-              <div className="rounded-[24px] bg-[#EF4444]/[0.06] border border-[#EF4444]/20 p-6">
-                <p className="text-[14px] font-semibold text-[#EF4444] mb-1">Market voided</p>
-                <p className="text-[13px] text-[#94A3B8]">
-                  The final metric could not be verified. All stakes are eligible for a full refund.
-                </p>
-              </div>
-            )}
+        {/* range rows */}
+        <RangeRows
+          ranges={market.ranges}
+          pools={market.pools}
+          totalStaked={market.totalStaked}
+          winningRangeIndex={market.winningRangeIndex}
+          state={market.state}
+        />
 
-            {/* Evidence */}
-            <div className="rounded-[24px] bg-[#080D14] border border-white/[0.04] p-6">
-              <h3 className="text-[14px] font-semibold text-[#94A3B8] mb-4 uppercase tracking-wide text-[12px]">Market evidence</h3>
-              <div className="space-y-2 text-[13px]">
-                {[
-                  { label: 'Tweet ID',     value: market.tweetId },
-                  { label: 'Created',      value: new Date(market.createdAt).toLocaleString() },
-                  { label: 'Expires',      value: new Date(market.expiresAt).toLocaleString() },
-                  { label: 'Start value',  value: formatCount(Number(market.startValue)) },
-                  { label: 'Source',       value: 'X API' },
-                  { label: 'Fallback',     value: 'GenLayer dispute resolution' },
-                ].map(({ label, value }) => (
-                  <div key={label} className="flex items-start justify-between gap-4">
-                    <span className="text-[#64748B] shrink-0">{label}</span>
-                    <span className="text-[#94A3B8] text-right font-mono text-[12px] break-all">{value}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+        {/* prediction panel */}
+        {isOpen && <PredictionPanel market={market} />}
 
-            {/* Market rules */}
-            <div className="rounded-[24px] bg-[#080D14] border border-white/[0.04] p-6">
-              <h3 className="text-[12px] font-semibold text-[#94A3B8] mb-4 uppercase tracking-wide">Market rules</h3>
-              <ul className="space-y-2 text-[13px] text-[#64748B]">
-                <li>Final total value at expiry decides the winner.</li>
-                <li>Range minimum is inclusive. Range maximum is exclusive.</li>
-                <li>The highest range is open-ended.</li>
-                <li>X API is the primary resolution source.</li>
-                <li>GenLayer handles fallback disputes.</li>
-                <li>Creator cannot place predictions on their own market.</li>
-              </ul>
-            </div>
+        {/* evidence */}
+        <EvidencePanel market={market} />
+
+        {/* genlayer */}
+        <GenLayerPanel report={market.genLayerReport} />
+
+        {/* activity */}
+        <ActivityFeed bets={market.recentBets} ranges={market.ranges} />
+      </div>
+
+      {/* ════════════════════════════════════════════════════════════
+          DESKTOP  (3-column grid, hidden below md)
+      ════════════════════════════════════════════════════════════ */}
+      <div className="hidden md:grid md:grid-cols-[1fr_1fr_360px] md:gap-6 md:max-w-[1200px] md:mx-auto md:px-6 md:pt-6 md:pb-10">
+        {/* ── col 1: tweet card + evidence + genlayer + activity ── */}
+        <div className="flex flex-col gap-5">
+          <TweetCard market={market} />
+          <EvidencePanel market={market} />
+          <GenLayerPanel report={market.genLayerReport} />
+          <ActivityFeed bets={market.recentBets} ranges={market.ranges} />
+        </div>
+
+        {/* ── col 2: question + stats + chart + ranges ── */}
+        <div className="flex flex-col gap-5">
+          {/* back + status */}
+          <div className="flex items-center gap-3">
+            <Link
+              href="/markets"
+              style={{ color: 'var(--text-muted)', fontSize: 12 }}
+              className="hover:opacity-80"
+            >
+              ← Markets
+            </Link>
+            <StateBadge state={market.state} />
+            <span
+              style={{
+                fontSize: 12,
+                color: isOpen ? 'var(--xen-amber)' : 'var(--text-muted)',
+              }}
+            >
+              {isOpen ? `${timeLeft(market.expiresAt)} left` : ''}
+            </span>
           </div>
 
-          {/* Right: action panel */}
-          <div className="space-y-4">
-            {me && (market.state === 'RESOLVED' || market.state === 'VOIDED' || market.state === 'CANCELLED') &&
-             market.contractAddress && market.userStakes?.length > 0 && (
-              <div className="rounded-[24px] bg-[#0B1220] border border-white/[0.06] p-5">
-                <p className="text-[14px] font-semibold text-[#F8FAFC] mb-4">
-                  {market.state === 'RESOLVED' ? 'Claim winnings' : 'Refund'}
-                </p>
-                <ClaimRefundButton
-                  contractAddress={market.contractAddress}
-                  state={market.state}
-                  winningRangeIndex={market.winningRangeIndex ?? null}
-                  userStakes={market.userStakes ?? []}
-                />
-              </div>
-            )}
+          {/* question */}
+          <h1
+            style={{ color: 'var(--text-primary)', fontSize: 24, fontWeight: 700, lineHeight: 1.25 }}
+          >
+            {question}
+          </h1>
 
-            {market.contractAddress && (
-              <div className="rounded-[24px] bg-[#0B1220] border border-white/[0.06] p-5">
-                <p className="text-[15px] font-semibold text-[#F8FAFC] mb-4">Place prediction</p>
-                <BetForm
-                  marketId={market.id}
-                  contractAddress={market.contractAddress}
-                  creator={market.creatorWallet}
-                  ranges={ranges}
-                  pools={market.pools ?? []}
-                  totalStaked={market.totalStaked}
-                  state={market.state}
-                  expiresAt={market.expiresAt}
-                />
-              </div>
-            )}
+          {/* stats bar */}
+          <StatsBar market={market} />
 
-            {!market.contractAddress && (
-              <div className="rounded-[24px] bg-[#080D14] border border-white/[0.04] p-5">
-                <p className="text-[13px] text-[#64748B] text-center">
-                  Market not yet deployed on-chain. The creator's transaction may be pending.
-                </p>
-              </div>
-            )}
-          </div>
+          {/* chart */}
+          <MarketChart market={market} />
+
+          {/* range rows */}
+          <RangeRows
+            ranges={market.ranges}
+            pools={market.pools}
+            totalStaked={market.totalStaked}
+            winningRangeIndex={market.winningRangeIndex}
+            state={market.state}
+          />
+        </div>
+
+        {/* ── col 3: sticky prediction panel ── */}
+        <div className="sticky top-6 self-start">
+          <PredictionPanel market={market} />
         </div>
       </div>
     </AppShell>
