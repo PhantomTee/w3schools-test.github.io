@@ -55,7 +55,8 @@ export default function MarketsPage() {
       if (metric) params.set('metric', metric)
       const res = await fetch(`/api/markets?${params.toString()}`)
       if (!res.ok) throw new Error('Failed to fetch markets')
-      return res.json()
+      const json = await res.json()
+      return Array.isArray(json) ? json : (json.markets ?? [])
     },
   })
 

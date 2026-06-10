@@ -30,7 +30,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${justMe.variable} font-display min-h-screen`}>
+      <body className={`${justMe.variable} font-display min-h-screen`} suppressHydrationWarning>
         <SketchFilter />
         <Providers>{children}</Providers>
       </body>
