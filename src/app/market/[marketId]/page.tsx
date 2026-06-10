@@ -152,7 +152,7 @@ function TweetCard({ market }: { market: any }) {
             href={`https://twitter.com/i/web/status/${market.tweetId}`}
             target="_blank"
             rel="noopener noreferrer"
-            style={{ color: 'var(--blue-primary)', fontSize: 12 }}
+            style={{ color: 'var(--accent-primary)', fontSize: 12 }}
             className="ml-auto hover:underline"
           >
             View tweet ↗
@@ -261,7 +261,7 @@ export default function MarketPage() {
         <div className="flex flex-col items-center justify-center gap-4 py-24">
           <p style={{ color: 'var(--text-muted)', fontSize: 16 }}>Market not found</p>
           <Link href="/markets">
-            <Button variant="ghost" size="sm" style={{ color: 'var(--blue-primary)' }}>
+            <Button variant="ghost" size="sm" style={{ color: 'var(--accent-primary)' }}>
               ← Back to Markets
             </Button>
           </Link>

@@ -22,11 +22,11 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
         className
       )}
     >
-      <span className={cn('transition-colors', isDark ? 'text-[var(--text-muted)]' : 'text-[var(--blue-primary)]')}>
+      <span className={cn('transition-colors', isDark ? 'text-[var(--text-muted)]' : 'text-[var(--accent-primary)]')}>
         Light
       </span>
       <span className="text-[var(--border-soft)]">/</span>
-      <span className={cn('transition-colors', isDark ? 'text-[var(--blue-primary)]' : 'text-[var(--text-muted)]')}>
+      <span className={cn('transition-colors', isDark ? 'text-[var(--accent-primary)]' : 'text-[var(--text-muted)]')}>
         Dark
       </span>
     </button>

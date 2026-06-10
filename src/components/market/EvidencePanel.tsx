@@ -77,7 +77,7 @@ export default function EvidencePanel({ market }: Props) {
             href={`https://twitter.com/i/web/status/${market.tweetId}`}
             target="_blank"
             rel="noopener noreferrer"
-            style={{ color: 'var(--blue-bright)' }}
+            style={{ color: 'var(--accent-bright)' }}
           >
             {market.tweetId}
           </a>
@@ -92,7 +92,7 @@ export default function EvidencePanel({ market }: Props) {
               href={`https://twitter.com/${market.xUsername}`}
               target="_blank"
               rel="noopener noreferrer"
-              style={{ color: 'var(--blue-bright)' }}
+              style={{ color: 'var(--accent-bright)' }}
             >
               @{market.xUsername}
             </a>

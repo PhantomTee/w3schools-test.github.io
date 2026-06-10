@@ -93,7 +93,7 @@ export function SwipeFeed({ markets }: SwipeFeedProps) {
             className={cn(
               'rounded-full transition-all duration-200',
               i === currentIndex
-                ? 'w-4 h-1.5 bg-[var(--blue-bright)]'
+                ? 'w-4 h-1.5 bg-[var(--accent-bright)]'
                 : i < currentIndex
                   ? 'w-1.5 h-1.5 bg-[var(--text-muted)]/30'
                   : 'w-1.5 h-1.5 bg-[var(--text-muted)]/50'

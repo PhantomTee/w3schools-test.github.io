@@ -247,7 +247,7 @@ export default function PredictionPanel({ market, onSuccess }: Props) {
           onClick={handleSubmit}
           className="w-full py-2.5 rounded-[12px] text-[14px] font-semibold text-white transition-opacity disabled:opacity-40"
           style={{
-            background: 'linear-gradient(135deg, var(--blue-primary), var(--blue-bright))',
+            background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-bright))',
           }}
         >
           {loading ? 'Confirming...' : 'Place Prediction'}
@@ -256,7 +256,7 @@ export default function PredictionPanel({ market, onSuccess }: Props) {
         <button
           className="w-full py-2.5 rounded-[12px] text-[14px] font-semibold text-white"
           style={{
-            background: 'linear-gradient(135deg, var(--blue-primary), var(--blue-bright))',
+            background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-bright))',
           }}
         >
           Connect Wallet

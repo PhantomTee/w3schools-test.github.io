@@ -66,7 +66,7 @@ export default function FeedPage() {
               className={cn(
                 'flex-1 py-1.5 rounded-[10px] text-[12px] font-medium transition-all duration-150',
                 filter === tab.key
-                  ? 'bg-[var(--blue-primary)] text-white'
+                  ? 'bg-[var(--accent-primary)] text-white'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'
               )}
             >
@@ -84,7 +84,7 @@ export default function FeedPage() {
               className={cn(
                 'shrink-0 px-3 py-1 rounded-full text-[11px] font-medium border transition-all duration-150',
                 metric === p.key
-                  ? 'border-[var(--border-active)] bg-[var(--blue-primary)]/10 text-[var(--blue-bright)]'
+                  ? 'border-[var(--border-active)] bg-[var(--accent-primary)]/10 text-[var(--accent-bright)]'
                   : 'border-[var(--border-soft)] text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:border-[rgba(59,130,246,0.2)]'
               )}
             >
@@ -102,7 +102,7 @@ export default function FeedPage() {
               className={cn(
                 'shrink-0 px-3 py-1 rounded-full text-[11px] font-medium border transition-all duration-150',
                 duration === p.key
-                  ? 'border-[var(--border-active)] bg-[var(--blue-primary)]/10 text-[var(--blue-bright)]'
+                  ? 'border-[var(--border-active)] bg-[var(--accent-primary)]/10 text-[var(--accent-bright)]'
                   : 'border-[var(--border-soft)] text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:border-[rgba(59,130,246,0.2)]'
               )}
             >

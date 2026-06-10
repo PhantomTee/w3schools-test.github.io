@@ -37,7 +37,7 @@ export default function LandingPage() {
             </p>
             <h1 className="text-[36px] lg:text-[52px] font-semibold leading-[1.08] tracking-tight mb-5">
               Predict tweet metrics.<br />
-              <span className="text-[var(--blue-bright)]">Win USDC.</span>
+              <span className="text-[var(--accent-bright)]">Win USDC.</span>
             </h1>
             <p className="text-[16px] text-[var(--text-secondary)] leading-relaxed mb-8 max-w-[480px]">
               Xen turns any tweet into a pari-mutuel range market. Stake USDC on where the metric lands —
@@ -81,7 +81,7 @@ export default function LandingPage() {
                 {/* mock status row */}
                 <div className="mt-8 mx-3">
                   <div className="flex gap-1.5 mb-2">
-                    <div className="h-1 w-8 rounded-full bg-[var(--blue-bright)]" />
+                    <div className="h-1 w-8 rounded-full bg-[var(--accent-bright)]" />
                     <div className="h-1 w-1.5 rounded-full bg-[var(--text-muted)]/50" />
                     <div className="h-1 w-1.5 rounded-full bg-[var(--text-muted)]/50" />
                   </div>
@@ -116,14 +116,14 @@ export default function LandingPage() {
                             key={i}
                             className={`flex justify-between px-2 py-1 rounded-[8px] border text-[9px] ${
                               i === 2
-                                ? 'border-[var(--border-active)] bg-[var(--blue-primary)]/10'
+                                ? 'border-[var(--border-active)] bg-[var(--accent-primary)]/10'
                                 : 'border-[var(--border-soft)] bg-[var(--bg-elevated)]'
                             }`}
                           >
-                            <span className={i === 2 ? 'text-[var(--blue-bright)]' : 'text-[var(--text-secondary)]'}>
+                            <span className={i === 2 ? 'text-[var(--accent-bright)]' : 'text-[var(--text-secondary)]'}>
                               {label}
                             </span>
-                            <span className={`font-semibold tabular-nums ${i === 2 ? 'text-[var(--blue-bright)]' : 'text-[var(--text-muted)]'}`}>
+                            <span className={`font-semibold tabular-nums ${i === 2 ? 'text-[var(--accent-bright)]' : 'text-[var(--text-muted)]'}`}>
                               {MOCK_PAYOUTS[i]}
                             </span>
                           </div>
@@ -146,7 +146,7 @@ export default function LandingPage() {
           <div>
             {HOW_IT_WORKS.map((step, i) => (
               <div key={i} className="flex items-start gap-4 mb-7 last:mb-0">
-                <span className="shrink-0 w-7 h-7 rounded-full bg-[var(--blue-primary)]/10 border border-[var(--blue-primary)]/20 flex items-center justify-center text-[11px] font-semibold text-[var(--blue-bright)]">
+                <span className="shrink-0 w-7 h-7 rounded-full bg-[var(--accent-primary)]/10 border border-[var(--accent-primary)]/20 flex items-center justify-center text-[11px] font-semibold text-[var(--accent-bright)]">
                   {i + 1}
                 </span>
                 <div>
