@@ -73,21 +73,15 @@ export default function MarketsPage() {
       <div className="max-w-[900px] mx-auto px-4 pt-5 pb-8">
 
         {/* Filter tabs */}
-        <div className="bg-[var(--bg-elevated)] rounded-[14px] p-1 flex gap-1 mb-3">
+        <div className="border-2 border-[var(--ink)] rounded-[4px] p-1 flex gap-1 mb-3 [filter:url(#hand-draw)]">
           {FILTER_TABS.map((tab) => (
             <button
               key={tab.value}
               onClick={() => setFilter(tab.value)}
-              className="flex-1 py-1.5 rounded-[10px] text-[13px] font-medium transition-all"
+              className="flex-1 py-2 rounded-[4px] text-[16px] transition-all duration-150"
               style={{
-                background:
-                  filter === tab.value
-                    ? 'var(--ink)'
-                    : 'transparent',
-                color:
-                  filter === tab.value
-                    ? '#fff'
-                    : 'var(--text-muted)',
+                background: filter === tab.value ? 'var(--ink)' : 'transparent',
+                color:      filter === tab.value ? 'var(--paper)' : 'var(--text-muted)',
               }}
             >
               {tab.label}
@@ -101,20 +95,12 @@ export default function MarketsPage() {
             <button
               key={pill.value}
               onClick={() => setMetric(pill.value)}
-              className="shrink-0 px-3 py-1.5 rounded-full text-[12px] font-medium transition-all border"
+              className="shrink-0 px-4 py-1.5 rounded-[4px] text-[15px] border-2 transition-all duration-150 [filter:url(#hand-draw)]"
               style={{
-                background:
-                  metric === pill.value
-                    ? 'var(--ink)'
-                    : 'transparent',
-                color:
-                  metric === pill.value
-                    ? '#fff'
-                    : 'var(--text-muted)',
-                borderColor:
-                  metric === pill.value
-                    ? 'transparent'
-                    : 'var(--border-soft)',
+                background:  metric === pill.value ? 'var(--ink)' : 'transparent',
+                color:       metric === pill.value ? 'var(--paper)' : 'var(--text-muted)',
+                borderColor: metric === pill.value ? 'var(--ink)' : 'var(--border-strong)',
+                boxShadow:   metric === pill.value ? '2px 2px 0 var(--ink)' : 'none',
               }}
             >
               {pill.label}

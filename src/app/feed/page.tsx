@@ -58,16 +58,16 @@ export default function FeedPage() {
     <AppShell>
       <div className="max-w-[520px] mx-auto px-4 pt-4 pb-8">
         {/* Filter tabs */}
-        <div className="flex gap-1 mb-3 bg-[var(--bg-elevated)] rounded-[14px] p-1">
+        <div className="flex gap-1 mb-3 border-2 border-[var(--ink)] rounded-[4px] p-1 [filter:url(#hand-draw)]">
           {FILTER_TABS.map(tab => (
             <button
               key={tab.key}
               onClick={() => setFilter(tab.key)}
               className={cn(
-                'flex-1 py-1.5 rounded-[10px] text-[12px] font-medium transition-all duration-150',
+                'flex-1 py-2 rounded-[4px] text-[16px] transition-all duration-150',
                 filter === tab.key
-                  ? 'bg-[var(--blue-primary)] text-white'
-                  : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'
+                  ? 'bg-[var(--ink)] text-[var(--paper)]'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
               )}
             >
               {tab.label}
@@ -76,16 +76,16 @@ export default function FeedPage() {
         </div>
 
         {/* Metric pills */}
-        <div className="flex gap-1.5 overflow-x-auto hide-scrollbar mb-2 pb-1">
+        <div className="flex gap-2 overflow-x-auto hide-scrollbar mb-2 pb-1">
           {METRIC_PILLS.map(p => (
             <button
               key={p.key}
               onClick={() => setMetric(p.key)}
               className={cn(
-                'shrink-0 px-3 py-1 rounded-full text-[11px] font-medium border transition-all duration-150',
+                'shrink-0 px-4 py-1.5 rounded-[4px] text-[15px] border-2 transition-all duration-150 [filter:url(#hand-draw)]',
                 metric === p.key
-                  ? 'border-[var(--border-active)] bg-[var(--blue-primary)]/10 text-[var(--blue-bright)]'
-                  : 'border-[var(--border-soft)] text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:border-[rgba(59,130,246,0.2)]'
+                  ? 'border-[var(--ink)] bg-[var(--ink)] text-[var(--paper)] [box-shadow:2px_2px_0_var(--ink)]'
+                  : 'border-[var(--border-strong)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--ink)]'
               )}
             >
               {p.label}
@@ -94,16 +94,16 @@ export default function FeedPage() {
         </div>
 
         {/* Duration pills */}
-        <div className="flex gap-1.5 overflow-x-auto hide-scrollbar mb-5 pb-1">
+        <div className="flex gap-2 overflow-x-auto hide-scrollbar mb-5 pb-1">
           {DURATION_PILLS.map(p => (
             <button
               key={p.key}
               onClick={() => setDuration(p.key)}
               className={cn(
-                'shrink-0 px-3 py-1 rounded-full text-[11px] font-medium border transition-all duration-150',
+                'shrink-0 px-4 py-1.5 rounded-[4px] text-[15px] border-2 transition-all duration-150 [filter:url(#hand-draw)]',
                 duration === p.key
-                  ? 'border-[var(--border-active)] bg-[var(--blue-primary)]/10 text-[var(--blue-bright)]'
-                  : 'border-[var(--border-soft)] text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:border-[rgba(59,130,246,0.2)]'
+                  ? 'border-[var(--ink)] bg-[var(--ink)] text-[var(--paper)] [box-shadow:2px_2px_0_var(--ink)]'
+                  : 'border-[var(--border-strong)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--ink)]'
               )}
             >
               {p.label}
@@ -131,7 +131,7 @@ export default function FeedPage() {
 
         {isError && (
           <div className="text-center py-16">
-            <p className="text-[15px] text-[var(--text-muted)]">Could not load markets. Try again shortly.</p>
+            <p className="text-[18px] text-[var(--text-muted)]">Could not load markets. Try again shortly.</p>
           </div>
         )}
 
