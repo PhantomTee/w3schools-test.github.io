@@ -2,8 +2,20 @@
 import Link from 'next/link'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAccount } from 'wagmi'
+import { useSearchParams } from 'next/navigation'
 import { AppShell } from '@/components/layout/AppShell'
 import { Button } from '@/components/ui/button'
+
+const X_ERROR_MESSAGES: Record<string, string> = {
+  x_denied:              'You cancelled the X authorization.',
+  x_state_mismatch:      'OAuth state mismatch — try connecting again.',
+  x_state_expired:       'Authorization expired — try connecting again.',
+  x_token_exchange_failed: 'Failed to exchange tokens with X. Check your X app credentials.',
+  x_userinfo_failed:     'Connected but could not fetch your X profile.',
+  x_already_connected:   'This X account is already linked to a different wallet.',
+  x_invalid_callback:    'Invalid OAuth callback — try connecting again.',
+  wallet_not_connected:  'Sign in with your wallet first, then connect X.',
+}
 
 function truncateAddr(addr: string) {
   if (!addr) return ''
@@ -18,6 +30,9 @@ function formatDate(iso: string | null) {
 export default function ProfilePage() {
   const { address, isConnected } = useAccount()
   const queryClient = useQueryClient()
+  const searchParams = useSearchParams()
+  const xError     = searchParams.get('error')
+  const xConnected = searchParams.get('connected') === '1'
 
   const { data: meData } = useQuery({
     queryKey:  ['me'],
@@ -35,7 +50,18 @@ export default function ProfilePage() {
     <AppShell>
       <div className="max-w-[600px] mx-auto px-4 pt-6 pb-10">
         <h1 className="text-[36px] text-[var(--text-primary)] mb-1 leading-tight">Profile</h1>
-        <p className="text-[18px] text-[var(--text-muted)] mb-8">Your account and activity on Xen.</p>
+        <p className="text-[18px] text-[var(--text-muted)] mb-6">Your account and activity on Xen.</p>
+
+        {xConnected && (
+          <div className="mb-4 px-4 py-3 border-2 border-[var(--ink)] rounded-[4px] text-[16px] text-[var(--text-primary)]">
+            X account connected successfully.
+          </div>
+        )}
+        {xError && (
+          <div className="mb-4 px-4 py-3 border-2 border-[var(--xen-red)] rounded-[4px] text-[16px] text-[var(--xen-red)]">
+            {X_ERROR_MESSAGES[xError] ?? `Connection failed: ${xError}`}
+          </div>
+        )}
 
         {/* Identity card */}
         <div className="sketch-card p-5 mb-4">

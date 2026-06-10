@@ -24,21 +24,21 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(`${appUrl}/profile?error=x_invalid_callback`)
   }
 
-  const session = await getSession()
-
-  // Verify state
-  if (session.xOAuthState !== state) {
-    return NextResponse.redirect(`${appUrl}/profile?error=x_state_mismatch`)
-  }
-
-  if (!session.user?.walletAddress) {
-    return NextResponse.redirect(`${appUrl}/profile?error=wallet_not_connected`)
-  }
-
-  // Look up code verifier from DB (belt-and-suspenders with session)
+  // Look up the OAuth record from DB first — more reliable than the session
+  // cookie which can be dropped by Safari / strict browser settings during
+  // a cross-site redirect to twitter.com and back.
   const oauthRecord = await prisma.xOAuthState.findUnique({ where: { state } })
   if (!oauthRecord || oauthRecord.expiresAt < new Date()) {
     return NextResponse.redirect(`${appUrl}/profile?error=x_state_expired`)
+  }
+
+  // Resolve the wallet address: prefer session (still valid in most browsers),
+  // fall back to the value stored in the DB record when the session was created.
+  const session = await getSession()
+  const walletAddress = session.user?.walletAddress ?? oauthRecord.walletAddress
+
+  if (!walletAddress) {
+    return NextResponse.redirect(`${appUrl}/profile?error=wallet_not_connected`)
   }
 
   const codeVerifier = session.xOAuthCodeVerifier ?? oauthRecord.codeVerifier
@@ -59,15 +59,15 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(`${appUrl}/profile?error=x_userinfo_failed`)
   }
 
-  // Check xUserId not already connected to another wallet
+  // Ensure this X account isn't already linked to a different wallet
   const existing = await prisma.user.findUnique({ where: { xUserId: xUser.id } })
-  if (existing && existing.walletAddress !== session.user.walletAddress) {
+  if (existing && existing.walletAddress !== walletAddress) {
     return NextResponse.redirect(`${appUrl}/profile?error=x_already_connected`)
   }
 
   const now = new Date()
   await prisma.user.update({
-    where: { walletAddress: session.user.walletAddress },
+    where: { walletAddress },
     data:  {
       xUserId:         xUser.id,
       xUsername:       xUser.username,
@@ -78,11 +78,11 @@ export async function GET(req: NextRequest) {
     },
   })
 
-  // Clean up OAuth state
   await prisma.xOAuthState.delete({ where: { state } }).catch(() => {})
 
+  // Refresh session with X data (best-effort — the DB is the source of truth)
   session.user = {
-    ...session.user,
+    ...(session.user ?? { walletAddress }),
     xUserId:      xUser.id,
     xUsername:    xUser.username,
     xConnectedAt: (existing?.xConnectedAt ?? now).toISOString(),
