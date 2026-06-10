@@ -33,6 +33,7 @@ function ProfileContent() {
   const queryClient = useQueryClient()
   const searchParams = useSearchParams()
   const xError     = searchParams.get('error')
+  const xErrorDetail = searchParams.get('detail')
   const xConnected = searchParams.get('connected') === '1'
 
   const { data: meData } = useQuery({
@@ -60,7 +61,10 @@ function ProfileContent() {
         )}
         {xError && (
           <div className="mb-4 px-4 py-3 border-2 border-[var(--xen-red)] rounded-[4px] text-[16px] text-[var(--xen-red)]">
-            {X_ERROR_MESSAGES[xError] ?? `Connection failed: ${xError}`}
+            <p>{X_ERROR_MESSAGES[xError] ?? `Connection failed: ${xError}`}</p>
+            {xErrorDetail && (
+              <p className="mt-1 text-[14px] break-all opacity-80">{xErrorDetail}</p>
+            )}
           </div>
         )}
 

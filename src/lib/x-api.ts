@@ -124,7 +124,7 @@ export interface XUser {
 
 export async function getUserByMe(accessToken: string): Promise<XUser> {
   const res = await fetch(
-    `${X_API_BASE}/2/users/me?user.fields=id,name,username,profile_image_url,public_metrics`,
+    `${X_API_BASE}/2/users/me`,
     { headers: { Authorization: `Bearer ${accessToken}` } }
   )
   if (!res.ok) {
@@ -133,11 +133,9 @@ export async function getUserByMe(accessToken: string): Promise<XUser> {
   }
   const { data } = await res.json()
   return {
-    id:            data.id,
-    name:          data.name,
-    username:      data.username,
-    avatarUrl:     data.profile_image_url?.replace('_normal', '_400x400') ?? undefined,
-    followerCount: data.public_metrics?.followers_count ?? undefined,
+    id:       data.id,
+    name:     data.name,
+    username: data.username,
   }
 }
 

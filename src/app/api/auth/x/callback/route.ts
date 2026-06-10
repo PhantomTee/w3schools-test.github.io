@@ -56,7 +56,8 @@ export async function GET(req: NextRequest) {
     xUser = await getUserByMe(tokens.accessToken)
   } catch (e) {
     console.error('X /users/me error:', e)
-    return NextResponse.redirect(`${appUrl}/profile?error=x_userinfo_failed`)
+    const detail = encodeURIComponent((e as Error).message.slice(0, 160))
+    return NextResponse.redirect(`${appUrl}/profile?error=x_userinfo_failed&detail=${detail}`)
   }
 
   // Ensure this X account isn't already linked to a different wallet
