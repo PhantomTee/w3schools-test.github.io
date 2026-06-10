@@ -4,41 +4,43 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center whitespace-nowrap font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)] focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-40 select-none',
+  [
+    'inline-flex items-center justify-center whitespace-nowrap font-semibold',
+    'transition-all duration-100 select-none',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)] focus-visible:ring-offset-1',
+    'disabled:pointer-events-none disabled:opacity-40',
+    '[filter:url(#hand-draw)]',
+    /* sketch offset shadow — shifts on press */
+    'active:translate-x-[2px] active:translate-y-[2px]',
+  ].join(' '),
   {
     variants: {
       variant: {
-        // Primary — black in light mode, yellow in dark mode
-        primary:
-          'bg-[var(--accent-primary)] text-[var(--accent-text)] hover:opacity-85 active:scale-[0.98] rounded-[var(--sketch-r)]',
-        xen:
-          'bg-[var(--accent-primary)] text-[var(--accent-text)] hover:opacity-85 active:scale-[0.98] rounded-[var(--sketch-r)]',
         default:
-          'bg-[var(--accent-primary)] text-[var(--accent-text)] hover:opacity-85 active:scale-[0.98] rounded-[var(--sketch-r)]',
-        // Secondary — elevated surface
+          'bg-[var(--accent-primary)] text-[var(--accent-text)] border-2 border-[var(--text-primary)] [box-shadow:3px_3px_0_var(--text-primary)] hover:[box-shadow:4px_4px_0_var(--text-primary)] active:[box-shadow:1px_1px_0_var(--text-primary)]',
+        xen:
+          'bg-[var(--accent-primary)] text-[var(--accent-text)] border-2 border-[var(--text-primary)] [box-shadow:3px_3px_0_var(--text-primary)] hover:[box-shadow:4px_4px_0_var(--text-primary)] active:[box-shadow:1px_1px_0_var(--text-primary)]',
+        primary:
+          'bg-[var(--accent-primary)] text-[var(--accent-text)] border-2 border-[var(--text-primary)] [box-shadow:3px_3px_0_var(--text-primary)] hover:[box-shadow:4px_4px_0_var(--text-primary)] active:[box-shadow:1px_1px_0_var(--text-primary)]',
         secondary:
-          'bg-[var(--bg-elevated)] text-[var(--text-secondary)] border border-[var(--border-soft)] hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)] hover:border-[var(--border-strong)] active:scale-[0.98] rounded-[var(--sketch-r)]',
-        // Outline
+          'bg-[var(--bg-card)] text-[var(--text-primary)] border-2 border-[var(--text-primary)] [box-shadow:3px_3px_0_var(--text-primary)] hover:[box-shadow:4px_4px_0_var(--text-primary)] active:[box-shadow:1px_1px_0_var(--text-primary)]',
         outline:
-          'bg-transparent border border-[var(--border-strong)] text-[var(--text-primary)] hover:bg-[var(--accent-primary)]/10 hover:border-[var(--accent-primary)] active:scale-[0.98] rounded-[var(--sketch-r)]',
-        // Ghost
+          'bg-[var(--bg-card)] text-[var(--text-primary)] border-2 border-[var(--text-primary)] [box-shadow:3px_3px_0_var(--text-primary)] hover:[box-shadow:4px_4px_0_var(--text-primary)] active:[box-shadow:1px_1px_0_var(--text-primary)]',
         ghost:
-          'text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] rounded-[var(--sketch-r)]',
-        // Destructive
+          'bg-transparent text-[var(--text-muted)] border-2 border-transparent hover:border-[var(--border-strong)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]',
         destructive:
-          'bg-[var(--xen-red)]/10 text-[var(--xen-red)] border border-[var(--xen-red)]/20 hover:bg-[var(--xen-red)]/15 rounded-[var(--sketch-r)]',
-        // Link
+          'bg-[var(--bg-card)] text-[var(--xen-red)] border-2 border-[var(--xen-red)] [box-shadow:3px_3px_0_var(--xen-red)] hover:[box-shadow:4px_4px_0_var(--xen-red)] active:[box-shadow:1px_1px_0_var(--xen-red)]',
         link:
-          'text-[var(--accent-primary)] underline-offset-4 hover:underline p-0 h-auto',
+          'bg-transparent text-[var(--accent-primary)] underline-offset-4 hover:underline p-0 h-auto border-0 shadow-none [filter:none]',
       },
       size: {
-        default: 'h-10 px-5 py-2 text-[14px]',
-        sm:      'h-8 px-3 text-[12px] rounded-[6px]',
-        md:      'h-10 px-5 text-[14px]',
-        lg:      'h-12 px-6 text-[15px] rounded-[10px]',
-        xl:      'h-14 px-8 text-[16px] rounded-[10px]',
-        '2xl':   'h-16 px-10 text-[18px] rounded-[12px]',
-        icon:    'h-9 w-9',
+        default: 'h-10 px-5 py-2 text-[15px] rounded-[3px]',
+        sm:      'h-8  px-3 text-[13px] rounded-[3px]',
+        md:      'h-10 px-5 text-[15px] rounded-[3px]',
+        lg:      'h-12 px-6 text-[16px] rounded-[3px]',
+        xl:      'h-14 px-8 text-[17px] rounded-[3px]',
+        '2xl':   'h-16 px-10 text-[18px] rounded-[3px]',
+        icon:    'h-9 w-9 rounded-[3px]',
       },
     },
     defaultVariants: { variant: 'default', size: 'default' },

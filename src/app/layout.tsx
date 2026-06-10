@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Caveat } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
+import { SketchFilter } from '@/components/ui/sketch-filter'
 
 const caveat = Caveat({
   subsets:  ['latin'],
@@ -30,6 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${caveat.variable} font-display min-h-screen`}>
+        <SketchFilter />
         <Providers>{children}</Providers>
       </body>
     </html>
