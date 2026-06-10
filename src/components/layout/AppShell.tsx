@@ -185,7 +185,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </main>
 
         {/* Mobile bottom nav */}
-        <nav className="relative md:hidden fixed bottom-0 inset-x-0 z-40 bg-[var(--bg-base)]">
+        <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-[var(--bg-base)]">
           <SketchLine side="top" />
           <div className="flex">
             {NAV_PRIMARY.map(n => (
