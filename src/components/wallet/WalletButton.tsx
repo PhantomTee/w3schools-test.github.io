@@ -19,7 +19,7 @@ export function WalletButton() {
   const [signError, setSignError] = useState<string | null>(null)
   const qc = useQueryClient()
 
-  const { data: me } = useQuery({
+  const { data: me, isLoading: meLoading } = useQuery({
     queryKey:  ['me'],
     queryFn:   async () => {
       const res = await fetch('/api/auth/me')
@@ -86,6 +86,7 @@ export function WalletButton() {
   }
 
   if (!isAuthed) {
+    if (meLoading) return null
     return (
       <div className="flex flex-col items-end gap-1">
         <Button variant="outline" size="sm" onClick={handleSignIn} disabled={loading}>

@@ -1,9 +1,22 @@
 'use client'
+import { Suspense } from 'react'
 import Link from 'next/link'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAccount } from 'wagmi'
+import { useSearchParams } from 'next/navigation'
 import { AppShell } from '@/components/layout/AppShell'
 import { Button } from '@/components/ui/button'
+
+const X_ERROR_MESSAGES: Record<string, string> = {
+  x_denied:              'You cancelled the X authorization.',
+  x_state_mismatch:      'OAuth state mismatch — try connecting again.',
+  x_state_expired:       'Authorization expired — try connecting again.',
+  x_token_exchange_failed: 'Failed to exchange tokens with X. Check your X app credentials.',
+  x_userinfo_failed:     'Connected but could not fetch your X profile.',
+  x_already_connected:   'This X account is already linked to a different wallet.',
+  x_invalid_callback:    'Invalid OAuth callback — try connecting again.',
+  wallet_not_connected:  'Sign in with your wallet first, then connect X.',
+}
 
 function truncateAddr(addr: string) {
   if (!addr) return ''
@@ -15,13 +28,17 @@ function formatDate(iso: string | null) {
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
-export default function ProfilePage() {
+function ProfileContent() {
   const { address, isConnected } = useAccount()
   const queryClient = useQueryClient()
+  const searchParams = useSearchParams()
+  const xError       = searchParams.get('error')
+  const xErrorDetail = searchParams.get('detail')
+  const xConnected   = searchParams.get('connected') === '1'
 
   const { data: meData } = useQuery({
-    queryKey: ['me'],
-    queryFn:  () => fetch('/api/auth/me').then(r => r.json()),
+    queryKey:  ['me'],
+    queryFn:   () => fetch('/api/auth/me').then(r => r.json()),
     staleTime: 60_000,
   })
   const user = meData?.user
@@ -36,6 +53,20 @@ export default function ProfilePage() {
       <div className="max-w-[600px] mx-auto px-4 pt-6 pb-10">
         <h1 className="text-[22px] font-semibold text-[var(--text-primary)] mb-1">Profile</h1>
         <p className="text-[14px] text-[var(--text-muted)] mb-6">Your account and activity on Xen.</p>
+
+        {xConnected && (
+          <div className="mb-4 px-4 py-3 rounded-[12px] bg-[var(--xen-green)]/10 border border-[var(--xen-green)]/30 text-[14px] text-[var(--xen-green)]">
+            X account connected successfully.
+          </div>
+        )}
+        {xError && (
+          <div className="mb-4 px-4 py-3 rounded-[12px] bg-[var(--xen-red)]/10 border border-[var(--xen-red)]/30 text-[14px] text-[var(--xen-red)]">
+            <p>{X_ERROR_MESSAGES[xError] ?? `Connection failed: ${xError}`}</p>
+            {xErrorDetail && (
+              <p className="mt-1 text-[12px] break-all opacity-80">{xErrorDetail}</p>
+            )}
+          </div>
+        )}
 
         {/* Profile header */}
         <div className="bg-[var(--bg-elevated)] rounded-[20px] p-5 border border-[var(--border-soft)] mb-3">
@@ -161,5 +192,13 @@ export default function ProfilePage() {
         </div>
       </div>
     </AppShell>
+  )
+}
+
+export default function ProfilePage() {
+  return (
+    <Suspense>
+      <ProfileContent />
+    </Suspense>
   )
 }

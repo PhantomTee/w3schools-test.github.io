@@ -10,7 +10,8 @@
 import crypto from 'crypto'
 import type { Tweet, NormalizedTweetMetrics, EligibleTweet } from '@/types/tweet'
 
-const X_API_BASE = 'https://api.twitter.com'
+const X_API_BASE   = 'https://api.twitter.com'  // REST API calls
+const X_OAUTH_BASE = 'https://x.com'             // OAuth page — sessions live on x.com, not twitter.com
 const CLIENT_ID  = process.env.X_CLIENT_ID!
 const CLIENT_SECRET = process.env.X_CLIENT_SECRET!
 const CALLBACK_URL  = process.env.X_CALLBACK_URL!
@@ -41,7 +42,7 @@ export function getOAuthUrl(state: string, codeChallenge: string): string {
     code_challenge:        codeChallenge,
     code_challenge_method: 'S256',
   })
-  return `${X_API_BASE}/i/oauth2/authorize?${params}`
+  return `${X_OAUTH_BASE}/i/oauth2/authorize?${params}`
 }
 
 // ─── Token exchange ───────────────────────────────────────────────────────────
