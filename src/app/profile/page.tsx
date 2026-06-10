@@ -1,4 +1,5 @@
 'use client'
+import { Suspense } from 'react'
 import Link from 'next/link'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAccount } from 'wagmi'
@@ -27,7 +28,7 @@ function formatDate(iso: string | null) {
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
-export default function ProfilePage() {
+function ProfileContent() {
   const { address, isConnected } = useAccount()
   const queryClient = useQueryClient()
   const searchParams = useSearchParams()
@@ -171,5 +172,13 @@ export default function ProfilePage() {
         </div>
       </div>
     </AppShell>
+  )
+}
+
+export default function ProfilePage() {
+  return (
+    <Suspense>
+      <ProfileContent />
+    </Suspense>
   )
 }
