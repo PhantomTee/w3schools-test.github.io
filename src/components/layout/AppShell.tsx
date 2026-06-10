@@ -87,12 +87,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 {balanceLoading ? '—' : `${cash} USDC`}
               </span>
             </div>
-            <div className="flex justify-between items-baseline">
+            <div className="flex justify-between items-baseline mb-2">
               <span className="text-[14px] text-[var(--text-muted)]">Portfolio</span>
               <span className="text-[16px] text-[var(--text-primary)] tabular-nums">
                 {balanceLoading ? '—' : `${portfolio} USDC`}
               </span>
             </div>
+            <a
+              href="https://faucet.circle.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full text-center text-[13px] py-1 rounded-[4px] border border-[var(--ink)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+            >
+              Get test USDC →
+            </a>
           </div>
         )}
 
@@ -148,6 +156,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 <span className="text-[var(--text-primary)] tabular-nums">
                   {balanceLoading ? '—' : portfolio}
                 </span>
+                <a
+                  href="https://faucet.circle.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[13px] text-[var(--text-muted)] underline underline-offset-2 hover:text-[var(--text-primary)]"
+                >
+                  Faucet
+                </a>
               </div>
             )}
 

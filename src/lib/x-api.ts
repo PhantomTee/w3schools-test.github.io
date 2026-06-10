@@ -5,7 +5,6 @@
  * - Tweets fetched from /2/users/:id/tweets
  * - public_metrics used for all market metrics
  * - impression_count used for views
- * - Mock adapter enabled only when GENLAYER_MOCK_MODE=true (dev only)
  */
 import crypto from 'crypto'
 import type { Tweet, NormalizedTweetMetrics, EligibleTweet } from '@/types/tweet'
@@ -169,10 +168,6 @@ export async function getUserTweets(
   startTime?:  Date,
   maxResults   = 20
 ): Promise<Tweet[]> {
-  if (process.env.GENLAYER_MOCK_MODE === 'true') {
-    return getMockTweets(xUserId)
-  }
-
   const params = new URLSearchParams({
     max_results:  String(Math.min(maxResults, 100)),
     tweet_fields: TWEET_FIELDS,
@@ -201,10 +196,6 @@ export async function getTweetById(
   tweetId:     string,
   accessToken: string
 ): Promise<Tweet | null> {
-  if (process.env.GENLAYER_MOCK_MODE === 'true') {
-    return getMockTweetById(tweetId)
-  }
-
   const params = new URLSearchParams({ tweet_fields: TWEET_FIELDS })
   const res = await fetch(
     `${X_API_BASE}/2/tweets/${tweetId}?${params}`,
@@ -285,49 +276,3 @@ export function enrichTweets(
   })
 }
 
-// ─── Mock adapter (dev only) ──────────────────────────────────────────────────
-
-function getMockTweets(xUserId: string): Tweet[] {
-  const now = new Date()
-  return [
-    {
-      id:          '1800000000000000001',
-      text:        '🚀 Just shipped something huge. The future of decentralized prediction is here. #Web3 #DeFi',
-      created_at:  new Date(now.getTime() - 30 * 60_000).toISOString(), // 30 min ago
-      author_id:   xUserId,
-      public_metrics: { retweet_count: 24, reply_count: 8, like_count: 142, quote_count: 5, impression_count: 1200 },
-      lang: 'en',
-      possibly_sensitive: false,
-    },
-    {
-      id:          '1800000000000000002',
-      text:        "GM everyone. Today's alpha: range markets settle on final totals, not deltas. 🧵",
-      created_at:  new Date(now.getTime() - 90 * 60_000).toISOString(), // 90 min ago
-      author_id:   xUserId,
-      public_metrics: { retweet_count: 12, reply_count: 3, like_count: 88, quote_count: 2, impression_count: 750 },
-      lang: 'en',
-      possibly_sensitive: false,
-    },
-    {
-      id:          '1800000000000000003',
-      text:        'Posted before connection (should be ineligible)',
-      created_at:  new Date(now.getTime() - 8 * 60 * 60_000).toISOString(), // 8 hours ago
-      author_id:   xUserId,
-      public_metrics: { retweet_count: 0, reply_count: 0, like_count: 5, quote_count: 0, impression_count: 320 },
-      lang: 'en',
-      possibly_sensitive: false,
-    },
-  ]
-}
-
-function getMockTweetById(tweetId: string): Tweet {
-  return {
-    id:          tweetId,
-    text:        'Mock tweet for development',
-    created_at:  new Date(Date.now() - 30 * 60_000).toISOString(),
-    author_id:   'mockUserId',
-    public_metrics: { retweet_count: 24, reply_count: 8, like_count: 142, quote_count: 5, impression_count: 1200 },
-    lang: 'en',
-    possibly_sensitive: false,
-  }
-}

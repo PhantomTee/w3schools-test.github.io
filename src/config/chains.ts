@@ -9,7 +9,7 @@ export const arcChain = defineChain({
   id:   parseInt(process.env.NEXT_PUBLIC_ARC_CHAIN_ID ?? '5042002'),
   name: process.env.NEXT_PUBLIC_ARC_CHAIN_NAME ?? 'Arc Testnet',
   nativeCurrency: {
-    decimals: 18,
+    decimals: 6,
     name:     'USDC',
     symbol:   'USDC',
   },

@@ -9,7 +9,6 @@
  * Routing:
  *   GENLAYER_NODE_URL set  → GenLayer node JSON-RPC
  *   OPENAI_API_KEY set     → Direct OpenAI (dev/fallback)
- *   GENLAYER_MOCK_MODE=true → Deterministic mock (tests only)
  *
  * All outputs are strict JSON. Validation rejects and returns errors on
  * malformed output — never silently accepts.
@@ -59,10 +58,6 @@ export interface DisputeInput {
 // ─── Routing ──────────────────────────────────────────────────────────────────
 
 async function callAI(systemPrompt: string, userPrompt: string): Promise<string> {
-  if (process.env.GENLAYER_MOCK_MODE === 'true') {
-    throw new Error('Mock mode: use mock functions directly')
-  }
-
   if (process.env.OPENAI_API_KEY) {
     return callOpenAI(systemPrompt, userPrompt)
   }
@@ -71,10 +66,6 @@ async function callAI(systemPrompt: string, userPrompt: string): Promise<string>
 }
 
 async function callAIWithContract(fn: string, inputJson: string, systemPrompt: string, userPrompt: string): Promise<string> {
-  if (process.env.GENLAYER_MOCK_MODE === 'true') {
-    throw new Error('Mock mode: use mock functions directly')
-  }
-
   // Prefer GenLayer Studionet intelligent contract when contract address is set
   if (process.env.GENLAYER_CONTRACT_ADDRESS) {
     try {
@@ -233,8 +224,6 @@ function getMetricValue(m: NormalizedTweetMetrics, type: MetricType): number | n
 }
 
 export async function designMarket(input: DesignInput): Promise<GenLayerDesignResponse> {
-  if (process.env.GENLAYER_MOCK_MODE === 'true') return mockDesignMarket(input)
-
   const currentValue = getMetricValue(input.currentMetrics, input.metricType) ?? 0
 
   const userPrompt = JSON.stringify({
@@ -295,8 +284,6 @@ Reject if:
 Return JSON with: { "approved": boolean, "risk_score": 0-10, "rejection_reason": string|null, "flags": string[] }`
 
 export async function guardMarket(input: GuardInput): Promise<GenLayerGuardResponse> {
-  if (process.env.GENLAYER_MOCK_MODE === 'true') return mockGuardMarket(input)
-
   const userPrompt = JSON.stringify({
     tweet_text:           input.tweetText,
     tweet_id:             input.tweetId,
@@ -341,8 +328,6 @@ Return JSON:
 }`
 
 export async function resolveDispute(input: DisputeInput): Promise<GenLayerDisputeResponse> {
-  if (process.env.GENLAYER_MOCK_MODE === 'true') return mockResolveDispute(input)
-
   const userPrompt = JSON.stringify({
     tweet_id:          input.tweetId,
     metric_type:       input.metricType,
@@ -381,66 +366,6 @@ export async function resolveDispute(input: DisputeInput): Promise<GenLayerDispu
     winningRangeIndex:  (parsed.winning_range_index as number) ?? null,
     confidence,
     reason:             String(parsed.reason ?? ''),
-  }
-}
-
-// ─── Mock adapter (dev/test only) ─────────────────────────────────────────────
-
-function mockDesignMarket(input: DesignInput): GenLayerDesignResponse {
-  const currentValue = getMetricValue(input.currentMetrics, input.metricType) ?? 1000
-  const multiplier = input.durationHours <= 3 ? 1.5 : input.durationHours <= 12 ? 3 : 8
-
-  const step1 = Math.ceil(currentValue * 1.3)
-  const step2 = Math.ceil(currentValue * multiplier * 0.6)
-  const step3 = Math.ceil(currentValue * multiplier)
-  const step4 = Math.ceil(currentValue * multiplier * 1.8)
-
-  const ranges: Range[] = [
-    { min: currentValue, max: step1,  maxOpen: false, label: `${formatK(currentValue)}-${formatK(step1)}`, difficulty: 3 },
-    { min: step1,        max: step2,  maxOpen: false, label: `${formatK(step1)}-${formatK(step2)}`,        difficulty: 5 },
-    { min: step2,        max: step3,  maxOpen: false, label: `${formatK(step2)}-${formatK(step3)}`,        difficulty: 7 },
-    { min: step3,        max: step4,  maxOpen: false, label: `${formatK(step3)}-${formatK(step4)}`,        difficulty: 8 },
-    { min: step4,        max: null,   maxOpen: true,  label: `${formatK(step4)}+`,                         difficulty: 10 },
-  ]
-
-  return {
-    approved:     true,
-    marketType:   'range_prediction',
-    metricType:   input.metricType,
-    displayMetric: input.metricType === 'FINAL_VIEWS' ? 'views/impressions' : input.metricType.toLowerCase().replace('final_', ''),
-    durationHours: input.durationHours,
-    startValue:    currentValue,
-    ranges,
-    riskScore:     3,
-    qualityScore:  8,
-    reason:        '[MOCK] Ranges generated deterministically for development.',
-  }
-}
-
-function mockGuardMarket(_input: GuardInput): GenLayerGuardResponse {
-  return { approved: true, riskScore: 2, rejectionReason: null, flags: ['[MOCK]'] }
-}
-
-function mockResolveDispute(input: DisputeInput): GenLayerDisputeResponse {
-  if (input.xApiResult != null) {
-    const idx = input.ranges.findIndex(r => {
-      if (r.maxOpen) return input.xApiResult! >= r.min
-      return input.xApiResult! >= r.min && input.xApiResult! < (r.max as number)
-    })
-    return {
-      status:            idx >= 0 ? 'resolved' : 'void',
-      finalValue:        input.xApiResult,
-      winningRangeIndex: idx >= 0 ? idx : null,
-      confidence:        85,
-      reason:            '[MOCK] Resolved using provided X API value.',
-    }
-  }
-  return {
-    status:            'unresolvable',
-    finalValue:        null,
-    winningRangeIndex: null,
-    confidence:        0,
-    reason:            '[MOCK] No data available.',
   }
 }
 
