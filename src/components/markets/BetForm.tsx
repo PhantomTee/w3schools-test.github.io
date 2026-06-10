@@ -88,7 +88,7 @@ export function BetForm({ marketId, contractAddress, creator, ranges, pools, tot
   if (step === 'done') {
     return (
       <div className="py-6 text-center space-y-1">
-        <p className="text-[#22C55E] font-semibold">Prediction placed</p>
+        <p className="text-[var(--ink)] font-semibold">Prediction placed</p>
         <p className="text-[13px] text-[#64748B]">Your stake has been confirmed on Arc.</p>
       </div>
     )
@@ -112,16 +112,16 @@ export function BetForm({ marketId, contractAddress, creator, ranges, pools, tot
               disabled={!canBet}
               className={`w-full text-left p-4 rounded-[16px] border transition-all duration-150 ${
                 isSelected
-                  ? 'border-[rgba(59,130,246,0.45)] bg-[#2563EB]/[0.08] shadow-[0_0_0_1px_rgba(59,130,246,0.12)]'
-                  : 'border-white/[0.06] bg-[#080D14] hover:border-white/[0.10] hover:bg-white/[0.02]'
+                  ? 'border-[var(--ink)] bg-[var(--bg-elevated)] [box-shadow:2px_2px_0_var(--ink)]'
+                  : 'border-white/[0.06] bg-[var(--bg-elevated)] hover:border-white/[0.10] hover:bg-white/[0.02]'
               } ${!canBet ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
             >
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[14px] font-semibold text-[#F8FAFC]">{r.label}</span>
+                <span className="text-[14px] font-semibold text-[var(--text-primary)]">{r.label}</span>
                 <div className="text-right">
-                  <span className="text-[13px] text-[#94A3B8]">{poolDisplay} USDC</span>
+                  <span className="text-[13px] text-[var(--text-muted)]">{poolDisplay} USDC</span>
                   {impliedPct > 0 && (
-                    <span className="text-[12px] text-[#3B82F6] ml-2">
+                    <span className="text-[12px] text-[var(--ink)] ml-2">
                       ~{(100 / (impliedPct / 100)).toFixed(1)}x
                     </span>
                   )}
@@ -129,7 +129,7 @@ export function BetForm({ marketId, contractAddress, creator, ranges, pools, tot
               </div>
               <div className="h-[3px] rounded-full bg-white/[0.06] overflow-hidden">
                 <div
-                  className={`h-full rounded-full ${isSelected ? 'bg-[#3B82F6]' : 'bg-[#2563EB]/40'}`}
+                  className={`h-full rounded-full ${isSelected ? 'bg-[var(--ink)]' : 'bg-[var(--text-muted)]'}`}
                   style={{ width: `${Math.max(pct, pct > 0 ? 3 : 0)}%` }}
                 />
               </div>
@@ -152,14 +152,14 @@ export function BetForm({ marketId, contractAddress, creator, ranges, pools, tot
               step="0.01"
               value={amount}
               onChange={e => setAmount(e.target.value)}
-              className="flex-1 bg-[#080D14] border-white/[0.08] text-[#F8FAFC] placeholder:text-[#64748B] rounded-[12px] focus:border-[#3B82F6]/50"
+              className="flex-1 bg-[var(--bg-elevated)] border-[var(--border-soft)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] rounded-[12px] focus:border-[var(--ink)]"
             />
             <div className="flex gap-1">
               {[5, 10, 25].map(v => (
                 <button
                   key={v}
                   onClick={() => setAmount(String(v))}
-                  className="px-3 py-1 rounded-[10px] border border-white/[0.08] text-[12px] text-[#94A3B8] hover:bg-white/[0.04] hover:border-white/[0.12] transition-colors"
+                  className="px-3 py-1 rounded-[10px] border border-[var(--border-soft)] text-[12px] text-[var(--text-muted)] hover:bg-white/[0.04] hover:border-white/[0.12] transition-colors"
                 >
                   {v}
                 </button>

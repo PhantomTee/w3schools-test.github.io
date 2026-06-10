@@ -141,11 +141,11 @@ export default function CreateMarketPage() {
 
         {/* Back */}
         <div className="flex items-center gap-3">
-          <Link href="/profile" className="text-[13px] text-[#64748B] hover:text-[#94A3B8] transition-colors">
+          <Link href="/profile" className="text-[13px] text-[#64748B] hover:text-[var(--text-muted)] transition-colors">
             Profile
           </Link>
           <span className="text-[#64748B]">/</span>
-          <span className="text-[13px] text-[#94A3B8]">Create Market</span>
+          <span className="text-[13px] text-[var(--text-muted)]">Create Market</span>
         </div>
 
         <div>
@@ -175,7 +175,7 @@ export default function CreateMarketPage() {
             <div className="flex items-center justify-between text-[13px]">
               <span className="text-[#64748B]">Posted {formatAge(tweet.created_at)} ago</span>
               {tweet.eligible ? (
-                <span className="text-[#22C55E]">Eligible</span>
+                <span className="text-[var(--ink)]">Eligible</span>
               ) : (
                 <span className="text-[#EF4444]">{tweet.eligibilityNote}</span>
               )}
@@ -244,7 +244,7 @@ export default function CreateMarketPage() {
         {step === 'generating' && (
           <div className="rounded-[24px] bg-[#0B1220] border border-white/[0.06] p-10 text-center space-y-3">
             <div className="w-full h-[2px] bg-[#101827] rounded-full overflow-hidden mb-6">
-              <div className="h-full bg-gradient-to-r from-transparent via-[#3B82F6] to-transparent animate-[shimmer_1.6s_infinite] w-1/2" />
+              <div className="h-full bg-gradient-to-r from-transparent via-[var(--ink)] to-transparent animate-[shimmer_1.6s_infinite] w-1/2" />
             </div>
             <p className="text-[16px] font-semibold text-[#F8FAFC]">GenLayer is designing time-aware ranges</p>
             <p className="text-[13px] text-[#64748B]">Analysing tweet velocity, age, and selected duration.</p>
@@ -288,7 +288,7 @@ export default function CreateMarketPage() {
                     <span className="text-[14px] font-medium text-[#F8FAFC]">{r.label}</span>
                     <div className="flex items-center gap-3">
                       <div className="w-16 h-[3px] rounded-full bg-white/[0.06] overflow-hidden">
-                        <div className="h-full rounded-full bg-[#2563EB]/50" style={{ width: `${r.difficulty * 10}%` }} />
+                        <div className="h-full rounded-full bg-[var(--ink)]" style={{ width: `${r.difficulty * 10}%` }} />
                       </div>
                       <span className="text-[12px] text-[#64748B] w-16 text-right">
                         Difficulty {r.difficulty}/10
@@ -310,7 +310,7 @@ export default function CreateMarketPage() {
               </div>
 
               <div className="rounded-[12px] bg-[#080D14] p-4 text-[13px] text-[#64748B]">
-                <span className="text-[#94A3B8]">Question: </span>
+                <span className="text-[var(--text-muted)]">Question: </span>
                 "What will this tweet's final total {metricLabel(metric).toLowerCase()} be after {duration} hour{duration !== 1 ? 's' : ''}?"
               </div>
             </div>
@@ -334,7 +334,7 @@ export default function CreateMarketPage() {
         {(step === 'approving' || step === 'creating') && (
           <div className="rounded-[24px] bg-[#0B1220] border border-white/[0.06] p-10 text-center space-y-3">
             <div className="w-full h-[2px] bg-[#101827] rounded-full overflow-hidden mb-6">
-              <div className="h-full bg-gradient-to-r from-transparent via-[#3B82F6] to-transparent animate-[shimmer_1.6s_infinite] w-1/2" />
+              <div className="h-full bg-gradient-to-r from-transparent via-[var(--ink)] to-transparent animate-[shimmer_1.6s_infinite] w-1/2" />
             </div>
             <p className="text-[16px] font-semibold text-[#F8FAFC]">
               {step === 'approving' ? 'Approving USDC...' : 'Creating market on Arc...'}
@@ -346,7 +346,7 @@ export default function CreateMarketPage() {
         {/* Step 5: Done */}
         {step === 'done' && (
           <div className="rounded-[24px] bg-[#0B1220] border border-[rgba(34,197,94,0.25)] p-10 text-center space-y-4">
-            <div className="text-[40px] font-semibold text-[#22C55E] mb-2">Market created</div>
+            <div className="text-[40px] font-semibold text-[var(--ink)] mb-2">Market created</div>
             <p className="text-[14px] text-[#64748B]">
               Your {metricLabel(metric)} prediction market is live for {duration} hour{duration !== 1 ? 's' : ''}.
               Traders can now stake USDC on ranges.

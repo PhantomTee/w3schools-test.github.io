@@ -11,27 +11,28 @@ const LINES = [
 
 export function HeroText() {
   const [idx, setIdx] = useState(0)
-  const [visible, setVisible] = useState(true)
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setVisible(false)
-      setTimeout(() => {
-        setIdx(i => (i + 1) % LINES.length)
-        setVisible(true)
-      }, 300)
+      setIdx(i => (i + 1) % LINES.length)
     }, 3000)
     return () => clearInterval(interval)
   }, [])
 
-  const [line1, line2] = LINES[idx]
-
+  /* All phrases are rendered stacked in the same grid cell — the tallest one
+     sets the height, so rotation never shifts the layout below. */
   return (
-    <h1
-      className="font-display text-[clamp(52px,10vw,120px)] leading-[0.92] tracking-[-0.02em] uppercase mb-8 max-w-[900px]"
-      style={{ transition: 'opacity 0.3s ease', opacity: visible ? 1 : 0 }}
-    >
-      {line1}<br />{line2}
+    <h1 className="grid text-[clamp(56px,10vw,120px)] leading-[0.95] mb-8 max-w-[900px]">
+      {LINES.map(([a, b], i) => (
+        <span
+          key={i}
+          aria-hidden={i !== idx}
+          className="col-start-1 row-start-1 transition-opacity duration-300"
+          style={{ opacity: i === idx ? 1 : 0 }}
+        >
+          {a}<br />{b}
+        </span>
+      ))}
     </h1>
   )
 }

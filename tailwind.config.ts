@@ -11,9 +11,9 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        display: ['var(--font-display)', 'Anton', 'sans-serif'],
-        sans:    ['var(--font-sans)', 'Inter', 'system-ui', 'sans-serif'],
-        mono:    ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+        display: ['var(--font-display)', 'Just Me Again Down Here', 'cursive'],
+        sans:    ['var(--font-display)', 'Just Me Again Down Here', 'cursive'],
+        mono:    ['var(--font-display)', 'Just Me Again Down Here', 'cursive'],
       },
       colors: {
         // CSS variable mapped tokens
@@ -123,10 +123,10 @@ const config: Config = {
       boxShadow: {
         'card':        '0 2px 8px rgba(0,0,0,0.15)',
         'card-lg':     '0 8px 32px rgba(0,0,0,0.25)',
-        'sky-glow':    '0 0 40px rgba(56,189,248,0.30)',
-        'sky-sm':      '0 0 20px rgba(56,189,248,0.18)',
-        'green-glow':  '0 0 40px rgba(56,189,248,0.22)',
-        'green-sm':    '0 0 20px rgba(56,189,248,0.14)',
+        'sketch':      '3px 3px 0 var(--ink)',
+        'sketch-sm':   '2px 2px 0 var(--ink)',
+        'green-glow':  '0 0 40px rgba(0,0,0,0.15)',
+        'green-sm':    '0 0 20px rgba(0,0,0,0.10)',
       },
     },
   },

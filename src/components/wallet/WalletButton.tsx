@@ -99,35 +99,32 @@ export function WalletButton() {
         <div className="fixed inset-0 z-[100] flex items-center justify-center">
           {/* Backdrop */}
           <div
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/50"
             onClick={handleDisconnectFromModal}
           />
 
-          {/* Modal */}
-          <div className="relative z-10 w-[340px] mx-4 rounded-[16px] border border-[var(--border-strong)] bg-[var(--bg-card)] shadow-2xl overflow-hidden">
-            {/* Top accent bar */}
-            <div className="h-1 w-full bg-[var(--accent-primary)]" />
-
+          {/* Modal — drawn box */}
+          <div className="relative z-10 w-[340px] mx-4 sketch-card overflow-hidden">
             <div className="p-6">
-              <h2 className="font-display text-[22px] uppercase tracking-tight text-[var(--text-primary)] mb-1">
+              <h2 className="text-[30px] text-[var(--text-primary)] mb-1 leading-none">
                 Sign in
               </h2>
-              <p className="text-[13px] text-[var(--text-muted)] mb-5">
+              <p className="text-[16px] text-[var(--text-muted)] mb-5">
                 Prove wallet ownership. No gas, no transaction — just a signature.
               </p>
 
               {/* Wallet address pill */}
-              <div className="flex items-center gap-2 px-3 py-2 rounded-[10px] bg-[var(--bg-elevated)] border border-[var(--border-soft)] mb-5">
-                <span className="h-2 w-2 rounded-full bg-[var(--accent-primary)] shrink-0" />
-                <span className="font-mono text-[12px] text-[var(--text-primary)] truncate">{address}</span>
+              <div className="flex items-center gap-2 px-3 py-2 mb-5 border-2 border-[var(--ink)] rounded-[4px] [filter:url(#hand-draw)]">
+                <span className="h-2 w-2 rounded-full bg-[var(--ink)] shrink-0" />
+                <span className="text-[14px] text-[var(--text-primary)] truncate">{address}</span>
               </div>
 
               {signError && (
-                <p className="text-[12px] text-red-500 mb-4 leading-snug">{signError}</p>
+                <p className="text-[15px] text-[var(--xen-red)] mb-4 leading-snug">{signError}</p>
               )}
 
               <Button
-                variant="xen"
+                variant="filled"
                 className="w-full mb-2"
                 onClick={handleSignIn}
                 disabled={loading}
@@ -137,7 +134,7 @@ export function WalletButton() {
 
               <button
                 onClick={handleDisconnectFromModal}
-                className="w-full text-center text-[12px] text-[var(--text-muted)] hover:text-[var(--text-secondary)] py-1.5 transition-colors"
+                className="w-full text-center text-[15px] text-[var(--text-muted)] hover:text-[var(--text-primary)] py-1.5 transition-colors underline underline-offset-4"
               >
                 Disconnect wallet
               </button>
@@ -155,22 +152,22 @@ export function WalletButton() {
         <div className="relative">
           <button
             onClick={() => setOpen(o => !o)}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-[10px] border border-[var(--border-strong)] bg-[var(--bg-elevated)] hover:bg-[var(--bg-muted)] hover:border-[var(--border-active)] transition-all text-[13px] text-[var(--text-secondary)]"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-[4px] border-2 border-[var(--ink)] bg-[var(--paper)] [box-shadow:2px_2px_0_var(--ink)] hover:[box-shadow:3px_3px_0_var(--ink)] active:translate-x-[1px] active:translate-y-[1px] active:[box-shadow:1px_1px_0_var(--ink)] [filter:url(#hand-draw)] transition-all duration-100 text-[15px]"
           >
-            <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent-primary)] shrink-0" />
-            <span className="font-mono text-xs text-[var(--text-primary)]">{shortenAddress(address!)}</span>
+            <span className="h-1.5 w-1.5 rounded-full bg-[var(--ink)] shrink-0" />
+            <span className="text-[14px] text-[var(--text-primary)]">{shortenAddress(address!)}</span>
           </button>
 
           {open && (
             <>
               <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-              <div className="absolute right-0 mt-2 w-52 rounded-[16px] border border-[var(--border-strong)] bg-[var(--bg-card)] shadow-2xl p-2 z-50 animate-fade-in">
-                <div className="px-3 py-2 text-[12px] text-[var(--text-muted)] border-b border-[var(--border-soft)] mb-1">
+              <div className="absolute right-0 mt-2 w-52 sketch-card p-2 z-50 animate-fade-in">
+                <div className="px-3 py-2 text-[15px] text-[var(--text-muted)] border-b-2 border-[var(--border-soft)] mb-1">
                   {me?.user?.marketsCreatedToday ?? 0} / 10 markets today
                 </div>
                 <button
                   onClick={handleDisconnect}
-                  className="w-full text-left px-3 py-2 text-[13px] rounded-[10px] text-red-500 hover:bg-red-500/10 transition-colors"
+                  className="w-full text-left px-3 py-2 text-[16px] rounded-[4px] text-[var(--xen-red)] hover:bg-[var(--bg-elevated)] transition-colors"
                 >
                   Disconnect
                 </button>

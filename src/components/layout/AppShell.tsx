@@ -26,6 +26,16 @@ async function safeJson(res: Response) {
   try { return await res.json() } catch { return {} }
 }
 
+/* Wobbly drawn border line — a filtered span, so the parent container
+   stays filter-free (filters on containers break position:fixed children). */
+function SketchLine({ side }: { side: 'top' | 'bottom' | 'right' }) {
+  const pos =
+    side === 'top'    ? 'top-0 left-0 right-0 h-[2px]'  :
+    side === 'bottom' ? 'bottom-0 left-0 right-0 h-[2px]' :
+                        'top-0 bottom-0 right-0 w-[2px]'
+  return <span aria-hidden className={`absolute ${pos} sketch-line pointer-events-none`} />
+}
+
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const { isConnected } = useAccount()
@@ -47,46 +57,39 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     return pathname?.startsWith(href) ?? false
   }
 
+  const navLinkClass = (active: boolean) => cn(
+    'flex items-center gap-2.5 px-3 py-2 text-[18px] rounded-[4px] transition-all duration-100',
+    active
+      ? 'bg-[var(--ink)] text-[var(--paper)] border-2 border-[var(--ink)] [box-shadow:2px_2px_0_var(--ink)] [filter:url(#hand-draw)]'
+      : 'text-[var(--text-muted)] hover:text-[var(--ink)] hover:bg-[var(--bg-elevated)]'
+  )
+
   return (
     <div className="min-h-screen flex bg-[var(--bg-base)]">
 
       {/* ── Desktop sidebar ─────────────────────────────────────────── */}
-      <aside
-        className="hidden md:flex flex-col w-[224px] shrink-0 h-screen sticky top-0 bg-[var(--bg-base)]"
-        style={{ borderRight: '2px solid var(--text-primary)', filter: 'url(#hand-draw-lg)' }}
-      >
+      <aside className="relative hidden md:flex flex-col w-[224px] shrink-0 h-screen sticky top-0 bg-[var(--bg-base)]">
+        <SketchLine side="right" />
+
         {/* Logo */}
         <div className="px-6 pt-7 pb-5">
           <Link href="/">
-            <span
-              className="font-display text-[26px] font-bold text-[var(--text-primary)] tracking-tight"
-              style={{ textShadow: '2px 2px 0 var(--accent-primary)' }}
-            >
-              Xen
-            </span>
+            <span className="text-[34px] text-[var(--text-primary)] leading-none">Xen</span>
           </Link>
         </div>
 
         {/* Balances */}
         {isConnected && (
-          <div
-            className="mx-3 mb-4 px-3 py-2.5 bg-[var(--bg-card)]"
-            style={{
-              border: '2px solid var(--text-primary)',
-              boxShadow: '3px 3px 0 var(--text-primary)',
-              borderRadius: '3px',
-              filter: 'url(#hand-draw)',
-            }}
-          >
+          <div className="mx-3 mb-4 px-3 py-2.5 sketch-panel">
             <div className="flex justify-between items-baseline mb-1">
-              <span className="text-[11px] text-[var(--text-muted)] uppercase tracking-wider">Cash</span>
-              <span className="text-[13px] font-semibold text-[var(--text-primary)] tabular-nums">
+              <span className="text-[14px] text-[var(--text-muted)]">Cash</span>
+              <span className="text-[16px] text-[var(--text-primary)] tabular-nums">
                 {balanceLoading ? '—' : `${cash} USDC`}
               </span>
             </div>
             <div className="flex justify-between items-baseline">
-              <span className="text-[11px] text-[var(--text-muted)] uppercase tracking-wider">Portfolio</span>
-              <span className="text-[13px] font-semibold text-[var(--accent-primary)] tabular-nums">
+              <span className="text-[14px] text-[var(--text-muted)]">Portfolio</span>
+              <span className="text-[16px] text-[var(--text-primary)] tabular-nums">
                 {balanceLoading ? '—' : `${portfolio} USDC`}
               </span>
             </div>
@@ -94,59 +97,19 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         )}
 
         {/* Nav */}
-        <nav className="flex-1 px-3 space-y-1 overflow-y-auto">
+        <nav className="flex-1 px-3 space-y-1.5 overflow-y-auto">
           {NAV_PRIMARY.map(n => (
-            <Link
-              key={n.href}
-              href={n.href}
-              style={isActive(n.href) ? {
-                border: '2px solid var(--text-primary)',
-                boxShadow: '2px 2px 0 var(--text-primary)',
-                borderRadius: '3px',
-                filter: 'url(#hand-draw)',
-                background: 'var(--accent-primary)',
-                color: 'var(--accent-text)',
-              } : {
-                borderRadius: '3px',
-              }}
-              className={cn(
-                'flex items-center gap-2.5 px-3 py-2 text-[15px] font-semibold transition-all duration-100',
-                isActive(n.href)
-                  ? ''
-                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]'
-              )}
-            >
-              <n.icon size={15} strokeWidth={2.5} className="shrink-0" />
+            <Link key={n.href} href={n.href} className={navLinkClass(isActive(n.href))}>
+              <n.icon size={16} strokeWidth={2.2} className="shrink-0" />
               <span>{n.label}</span>
             </Link>
           ))}
 
-          <div
-            className="pt-3 mt-3"
-            style={{ borderTop: '2px solid var(--border-strong)' }}
-          >
+          <div className="relative pt-3 mt-3">
+            <SketchLine side="top" />
             {NAV_SECONDARY.map(n => (
-              <Link
-                key={n.href}
-                href={n.href}
-                style={isActive(n.href) ? {
-                  border: '2px solid var(--text-primary)',
-                  boxShadow: '2px 2px 0 var(--text-primary)',
-                  borderRadius: '3px',
-                  filter: 'url(#hand-draw)',
-                  background: 'var(--accent-primary)',
-                  color: 'var(--accent-text)',
-                } : {
-                  borderRadius: '3px',
-                }}
-                className={cn(
-                  'flex items-center gap-2.5 px-3 py-2 text-[15px] font-semibold transition-all duration-100',
-                  isActive(n.href)
-                    ? ''
-                    : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]'
-                )}
-              >
-                <n.icon size={15} strokeWidth={2.5} className="shrink-0" />
+              <Link key={n.href} href={n.href} className={navLinkClass(isActive(n.href))}>
+                <n.icon size={16} strokeWidth={2.2} className="shrink-0" />
                 <span>{n.label}</span>
               </Link>
             ))}
@@ -154,48 +117,35 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </nav>
 
         {/* Bottom */}
-        <div
-          className="p-3 space-y-2"
-          style={{ borderTop: '2px solid var(--text-primary)' }}
-        >
+        <div className="relative p-3 space-y-2">
+          <SketchLine side="top" />
           {me?.user?.xUsername && (
-            <p className="px-2 text-[12px] text-[var(--text-muted)] truncate">@{me.user.xUsername}</p>
+            <p className="px-2 text-[14px] text-[var(--text-muted)] truncate">@{me.user.xUsername}</p>
           )}
           <WalletButton />
-          <ThemeToggle className="w-full justify-center" />
+          <ThemeToggle className="w-full justify-center rounded-[4px]" />
         </div>
       </aside>
 
       {/* ── Content area ────────────────────────────────────────────── */}
       <div className="flex-1 flex flex-col min-w-0 min-h-screen">
 
-        {/* Mobile top header — ribbon style */}
-        <header
-          className="md:hidden sticky top-0 z-40 bg-[var(--bg-base)]"
-          style={{
-            borderTop: '2px solid var(--text-primary)',
-            borderBottom: '2px solid var(--text-primary)',
-            filter: 'url(#hand-draw-lg)',
-          }}
-        >
+        {/* Mobile top header */}
+        <header className="relative md:hidden sticky top-0 z-40 bg-[var(--bg-base)]">
+          <SketchLine side="bottom" />
           <div className="flex items-center justify-between h-14 px-5">
             <Link href="/">
-              <span
-                className="font-display text-[22px] font-bold text-[var(--text-primary)]"
-                style={{ textShadow: '2px 2px 0 var(--accent-primary)' }}
-              >
-                Xen
-              </span>
+              <span className="text-[28px] text-[var(--text-primary)] leading-none">Xen</span>
             </Link>
 
             {isConnected && (
-              <div className="flex items-center gap-3 text-[13px]">
-                <span className="text-[var(--text-muted)]">Cash </span>
-                <span className="font-semibold text-[var(--text-primary)] tabular-nums">
+              <div className="flex items-center gap-2 text-[15px]">
+                <span className="text-[var(--text-muted)]">Cash</span>
+                <span className="text-[var(--text-primary)] tabular-nums">
                   {balanceLoading ? '—' : cash}
                 </span>
-                <span className="text-[var(--border-strong)]">·</span>
-                <span className="font-semibold text-[var(--accent-primary)] tabular-nums">
+                <span className="text-[var(--text-muted)]">·</span>
+                <span className="text-[var(--text-primary)] tabular-nums">
                   {balanceLoading ? '—' : portfolio}
                 </span>
               </div>
@@ -205,13 +155,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
 
           {me?.user?.xUsername && (
-            <div className="flex items-center gap-3 px-5 pb-2 text-[12px] text-[var(--text-muted)]">
+            <div className="flex items-center gap-2 px-5 pb-2 text-[14px] text-[var(--text-muted)]">
               <span>@{me.user.xUsername}</span>
-              <span
-                className="h-1.5 w-1.5"
-                style={{ borderRadius: '50%', background: 'var(--xen-green)' }}
-              />
-              <span style={{ color: 'var(--xen-green)' }}>X connected</span>
+              <span className="h-1.5 w-1.5 rounded-full bg-[var(--ink)]" />
+              <span>X connected</span>
             </div>
           )}
         </header>
@@ -221,14 +168,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           {children}
         </main>
 
-        {/* Mobile bottom nav — ribbon strip */}
-        <nav
-          className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-[var(--bg-base)]"
-          style={{
-            borderTop: '2px solid var(--text-primary)',
-            filter: 'url(#hand-draw-lg)',
-          }}
-        >
+        {/* Mobile bottom nav */}
+        <nav className="relative md:hidden fixed bottom-0 inset-x-0 z-40 bg-[var(--bg-base)]">
+          <SketchLine side="top" />
           <div className="flex">
             {NAV_PRIMARY.map(n => (
               <Link
@@ -236,21 +178,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 href={n.href}
                 className={cn(
                   'flex-1 flex flex-col items-center justify-center py-2.5 gap-0.5 transition-colors',
-                  isActive(n.href)
-                    ? 'text-[var(--accent-primary)]'
-                    : 'text-[var(--text-muted)]'
+                  isActive(n.href) ? 'text-[var(--ink)]' : 'text-[var(--text-muted)]'
                 )}
               >
-                <n.icon
-                  size={20}
-                  strokeWidth={isActive(n.href) ? 2.5 : 2}
-                />
-                <span className="text-[11px] font-semibold">{n.label}</span>
+                <n.icon size={20} strokeWidth={isActive(n.href) ? 2.5 : 2} />
+                <span className="text-[13px]">{n.label}</span>
                 {isActive(n.href) && (
-                  <span
-                    className="h-[2px] w-5 mt-0.5"
-                    style={{ background: 'var(--accent-primary)' }}
-                  />
+                  <span className="h-[2px] w-5 mt-0.5 sketch-line" />
                 )}
               </Link>
             ))}

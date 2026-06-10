@@ -1,13 +1,13 @@
 import type { Metadata } from 'next'
-import { Caveat } from 'next/font/google'
+import { Just_Me_Again_Down_Here } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
 import { SketchFilter } from '@/components/ui/sketch-filter'
 
-const caveat = Caveat({
+const justMe = Just_Me_Again_Down_Here({
   subsets:  ['latin'],
   variable: '--font-display',
-  weight:   ['400', '600', '700'],
+  weight:   '400',
   display:  'swap',
 })
 
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${caveat.variable} font-display min-h-screen`}>
+      <body className={`${justMe.variable} font-display min-h-screen`}>
         <SketchFilter />
         <Providers>{children}</Providers>
       </body>

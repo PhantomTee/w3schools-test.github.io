@@ -3,44 +3,51 @@ import { Slot } from '@radix-ui/react-slot'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
+/* Hand-drawn buttons — paper fill, ink outline, offset ink shadow,
+   wobbled by the #hand-draw SVG displacement filter. */
+const sketch =
+  'bg-[var(--paper)] text-[var(--ink)] border-2 border-[var(--ink)] ' +
+  '[box-shadow:3px_3px_0_var(--ink)] hover:[box-shadow:4px_4px_0_var(--ink)] ' +
+  'active:[box-shadow:1px_1px_0_var(--ink)]'
+
+const sketchFilled =
+  'bg-[var(--ink)] text-[var(--paper)] border-2 border-[var(--ink)] ' +
+  '[box-shadow:3px_3px_0_var(--ink)] hover:[box-shadow:4px_4px_0_var(--ink)] ' +
+  'active:[box-shadow:1px_1px_0_var(--ink)]'
+
 const buttonVariants = cva(
   [
-    'inline-flex items-center justify-center whitespace-nowrap font-semibold',
+    'inline-flex items-center justify-center whitespace-nowrap font-normal',
     'transition-all duration-100 select-none',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)] focus-visible:ring-offset-1',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ink)] focus-visible:ring-offset-1',
     'disabled:pointer-events-none disabled:opacity-40',
     '[filter:url(#hand-draw)]',
-    /* sketch offset shadow — shifts on press */
     'active:translate-x-[2px] active:translate-y-[2px]',
   ].join(' '),
   {
     variants: {
       variant: {
-        default:
-          'bg-[var(--accent-primary)] text-[var(--accent-text)] border-2 border-[var(--text-primary)] [box-shadow:3px_3px_0_var(--text-primary)] hover:[box-shadow:4px_4px_0_var(--text-primary)] active:[box-shadow:1px_1px_0_var(--text-primary)]',
-        xen:
-          'bg-[var(--accent-primary)] text-[var(--accent-text)] border-2 border-[var(--text-primary)] [box-shadow:3px_3px_0_var(--text-primary)] hover:[box-shadow:4px_4px_0_var(--text-primary)] active:[box-shadow:1px_1px_0_var(--text-primary)]',
-        primary:
-          'bg-[var(--accent-primary)] text-[var(--accent-text)] border-2 border-[var(--text-primary)] [box-shadow:3px_3px_0_var(--text-primary)] hover:[box-shadow:4px_4px_0_var(--text-primary)] active:[box-shadow:1px_1px_0_var(--text-primary)]',
-        secondary:
-          'bg-[var(--bg-card)] text-[var(--text-primary)] border-2 border-[var(--text-primary)] [box-shadow:3px_3px_0_var(--text-primary)] hover:[box-shadow:4px_4px_0_var(--text-primary)] active:[box-shadow:1px_1px_0_var(--text-primary)]',
-        outline:
-          'bg-[var(--bg-card)] text-[var(--text-primary)] border-2 border-[var(--text-primary)] [box-shadow:3px_3px_0_var(--text-primary)] hover:[box-shadow:4px_4px_0_var(--text-primary)] active:[box-shadow:1px_1px_0_var(--text-primary)]',
+        default:   sketch,
+        xen:       sketch,
+        primary:   sketch,
+        secondary: sketch,
+        outline:   sketch,
+        filled:    sketchFilled,
         ghost:
-          'bg-transparent text-[var(--text-muted)] border-2 border-transparent hover:border-[var(--border-strong)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]',
+          'bg-transparent text-[var(--text-muted)] border-2 border-transparent hover:border-[var(--ink)] hover:text-[var(--ink)]',
         destructive:
-          'bg-[var(--bg-card)] text-[var(--xen-red)] border-2 border-[var(--xen-red)] [box-shadow:3px_3px_0_var(--xen-red)] hover:[box-shadow:4px_4px_0_var(--xen-red)] active:[box-shadow:1px_1px_0_var(--xen-red)]',
+          'bg-[var(--paper)] text-[var(--xen-red)] border-2 border-[var(--xen-red)] [box-shadow:3px_3px_0_var(--xen-red)] hover:[box-shadow:4px_4px_0_var(--xen-red)] active:[box-shadow:1px_1px_0_var(--xen-red)]',
         link:
-          'bg-transparent text-[var(--accent-primary)] underline-offset-4 hover:underline p-0 h-auto border-0 shadow-none [filter:none]',
+          'bg-transparent text-[var(--ink)] underline-offset-4 hover:underline p-0 h-auto border-0 shadow-none [filter:none]',
       },
       size: {
-        default: 'h-10 px-5 py-2 text-[15px] rounded-[3px]',
-        sm:      'h-8  px-3 text-[13px] rounded-[3px]',
-        md:      'h-10 px-5 text-[15px] rounded-[3px]',
-        lg:      'h-12 px-6 text-[16px] rounded-[3px]',
-        xl:      'h-14 px-8 text-[17px] rounded-[3px]',
-        '2xl':   'h-16 px-10 text-[18px] rounded-[3px]',
-        icon:    'h-9 w-9 rounded-[3px]',
+        default: 'h-10 px-5 py-2 text-[18px] rounded-[4px]',
+        sm:      'h-8  px-3 text-[16px] rounded-[4px]',
+        md:      'h-10 px-5 text-[18px] rounded-[4px]',
+        lg:      'h-12 px-6 text-[20px] rounded-[4px]',
+        xl:      'h-14 px-8 text-[22px] rounded-[4px]',
+        '2xl':   'h-16 px-10 text-[24px] rounded-[4px]',
+        icon:    'h-9 w-9 rounded-[4px]',
       },
     },
     defaultVariants: { variant: 'default', size: 'default' },

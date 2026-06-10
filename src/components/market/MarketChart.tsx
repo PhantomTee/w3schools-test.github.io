@@ -85,7 +85,7 @@ export default function MarketChart({ market }: Props) {
             {data.map((_, i) => (
               <Cell
                 key={i}
-                fill={market.winningRangeIndex === i ? '#22C55E' : '#2563EB'}
+                fill={market.winningRangeIndex === i ? 'var(--ink)' : 'var(--text-muted)'}
               />
             ))}
           </Bar>

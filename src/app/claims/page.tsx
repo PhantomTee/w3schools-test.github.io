@@ -64,7 +64,7 @@ export default function ClaimsPage() {
               <span
                 className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold text-white"
                 style={{
-                  background: 'linear-gradient(135deg, #2563EB, #3B82F6)',
+                  background: 'var(--ink)',
                 }}
               >
                 {step.n}

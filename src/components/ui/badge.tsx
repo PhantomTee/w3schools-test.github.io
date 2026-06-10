@@ -2,30 +2,34 @@ import * as React from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
+/* Hand-drawn pills — paper fill, ink outline, like the tag ribbons in a sketchbook. */
+const inkPill =
+  'bg-[var(--paper)] text-[var(--ink)] border-[1.5px] border-[var(--ink)] [box-shadow:1.5px_1.5px_0_var(--ink)]'
+
 const badgeVariants = cva(
-  'inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-medium tracking-wide transition-colors',
+  'inline-flex items-center rounded-full px-2.5 py-0.5 text-[14px] font-normal tracking-wide transition-colors [filter:url(#hand-draw)]',
   {
     variants: {
       variant: {
-        // Status
-        open:      'bg-[#10B981]/10 text-[#10B981]',
-        resolved:  'bg-[#34D399]/10 text-[#34D399]',
-        voided:    'bg-[#F87171]/10 text-[#F87171]',
-        ending:    'bg-[#FBBF24]/10 text-[#FBBF24]',
-        cancelled: 'bg-[var(--bg-muted)] text-[var(--text-muted)]',
+        // Status — all ink-on-paper; filled = inverted
+        open:      inkPill,
+        resolved:  'bg-[var(--ink)] text-[var(--paper)] border-[1.5px] border-[var(--ink)] [box-shadow:1.5px_1.5px_0_var(--ink)]',
+        voided:    'bg-[var(--paper)] text-[var(--xen-red)] border-[1.5px] border-[var(--xen-red)] [box-shadow:1.5px_1.5px_0_var(--xen-red)]',
+        ending:    inkPill,
+        cancelled: 'bg-[var(--bg-muted)] text-[var(--text-muted)] border-[1.5px] border-[var(--border-soft)]',
         // Neutral
-        default:   'bg-[var(--bg-elevated)] text-[var(--text-secondary)] border border-[var(--border-soft)]',
-        neutral:   'bg-[var(--bg-elevated)] text-[var(--text-muted)] border border-[var(--border-soft)]',
-        // Colored
-        green:     'bg-[#10B981]/10 text-[#10B981]',
-        blue:      'bg-[#60A5FA]/10 text-[#60A5FA]',
-        amber:     'bg-[#FBBF24]/10 text-[#FBBF24]',
-        red:       'bg-[#F87171]/10 text-[#F87171]',
-        purple:    'bg-[#A78BFA]/10 text-[#A78BFA]',
+        default:   inkPill,
+        neutral:   inkPill,
+        // Former colored variants — now ink
+        green:     inkPill,
+        blue:      inkPill,
+        amber:     inkPill,
+        red:       'bg-[var(--paper)] text-[var(--xen-red)] border-[1.5px] border-[var(--xen-red)] [box-shadow:1.5px_1.5px_0_var(--xen-red)]',
+        purple:    inkPill,
         // Compat
-        secondary:   'bg-[var(--bg-muted)] text-[var(--text-muted)]',
-        destructive: 'bg-[#F87171]/10 text-[#F87171]',
-        outline:     'border border-[var(--border-soft)] text-[var(--text-secondary)]',
+        secondary:   inkPill,
+        destructive: 'bg-[var(--paper)] text-[var(--xen-red)] border-[1.5px] border-[var(--xen-red)] [box-shadow:1.5px_1.5px_0_var(--xen-red)]',
+        outline:     inkPill,
       },
     },
     defaultVariants: { variant: 'default' },

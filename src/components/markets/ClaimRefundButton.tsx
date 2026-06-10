@@ -43,7 +43,7 @@ export function ClaimRefundButton({ contractAddress, state, winningRangeIndex, u
   if (done) {
     return (
       <div className="py-4 text-center space-y-1">
-        <p className="text-[#22C55E] font-semibold">Transaction confirmed</p>
+        <p className="text-[var(--ink)] font-semibold">Transaction confirmed</p>
         <p className="text-[13px] text-[#64748B]">USDC sent to your wallet.</p>
       </div>
     )

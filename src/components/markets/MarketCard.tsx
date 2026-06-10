@@ -51,7 +51,7 @@ export function MarketCard({ market }: Props) {
           </Badge>
         </div>
 
-        <p className="text-[13px] text-[#94A3B8] mb-4">
+        <p className="text-[13px] text-[var(--text-muted)] mb-4">
           What will the final total {metricLabel(market.metricType as any).toLowerCase()} be?
         </p>
 
@@ -64,11 +64,11 @@ export function MarketCard({ market }: Props) {
               <div key={i} className="flex items-center gap-3">
                 <div className="flex-1 h-[3px] rounded-full bg-white/[0.06] overflow-hidden">
                   <div
-                    className={`h-full rounded-full ${isWin ? 'bg-[#22C55E]' : 'bg-[#2563EB]/50'}`}
+                    className={`h-full rounded-full ${isWin ? 'bg-[var(--ink)]' : 'bg-[var(--text-muted)]'}`}
                     style={{ width: `${Math.max(pct, pct > 0 ? 3 : 0)}%` }}
                   />
                 </div>
-                <span className={`text-[12px] font-medium w-[72px] text-right tabular-nums ${isWin ? 'text-[#22C55E]' : 'text-[#94A3B8]'}`}>
+                <span className={`text-[12px] font-medium w-[72px] text-right tabular-nums ${isWin ? 'text-[var(--ink)]' : 'text-[var(--text-muted)]'}`}>
                   {r.label}
                 </span>
               </div>
@@ -82,7 +82,7 @@ export function MarketCard({ market }: Props) {
             <span className="text-[#F59E0B] font-medium">Ends in {timeUntil(market.expiresAt)}</span>
           )}
           {market.state === 'RESOLVED' && (
-            <span className="text-[#3B82F6]">Settled</span>
+            <span className="text-[var(--ink)]">Settled</span>
           )}
           {market.state === 'LOCKED' && (
             <span className="text-[#F59E0B]">Locked</span>

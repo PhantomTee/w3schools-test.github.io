@@ -92,7 +92,7 @@ export function MarketSwipeCard({
             <div className="absolute inset-0 bg-gradient-to-br from-[#1A1A1A] via-[#242424] to-[#1A1A1A]">
               <div
                 className="absolute inset-0 opacity-[0.08]"
-                style={{ backgroundImage: 'radial-gradient(circle at 30% 50%, #10B981 0%, transparent 60%)' }}
+                style={{ backgroundImage: 'radial-gradient(circle at 30% 50%, var(--text-muted) 0%, transparent 60%)' }}
               />
             </div>
           )}

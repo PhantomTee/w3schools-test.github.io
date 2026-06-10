@@ -52,7 +52,7 @@ export function TweetCard({ tweet, showCreateButton = true }: Props) {
       <div className="flex items-center justify-between mb-3 text-[13px]">
         <span className="text-[#64748B]">Posted {formatAge(tweet.created_at)} ago</span>
         {tweet.eligible && (
-          <span className="text-[#3B82F6]">Creation window open</span>
+          <span className="text-[var(--ink)]">Creation window open</span>
         )}
       </div>
 
@@ -70,7 +70,7 @@ export function TweetCard({ tweet, showCreateButton = true }: Props) {
       )}
       {showCreateButton && tweet.activeMarketCount > 0 && tweet.eligible && (
         <div className="mt-2 text-center">
-          <Link href={`/dashboard?tweet=${tweet.id}`} className="text-[12px] text-[#3B82F6] hover:text-[#60A5FA] transition-colors">
+          <Link href={`/dashboard?tweet=${tweet.id}`} className="text-[12px] text-[var(--ink)] hover:text-[var(--text-secondary)] transition-colors">
             View existing markets
           </Link>
         </div>

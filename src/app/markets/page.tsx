@@ -82,7 +82,7 @@ export default function MarketsPage() {
               style={{
                 background:
                   filter === tab.value
-                    ? 'linear-gradient(135deg, #2563EB, #3B82F6)'
+                    ? 'var(--ink)'
                     : 'transparent',
                 color:
                   filter === tab.value
@@ -105,7 +105,7 @@ export default function MarketsPage() {
               style={{
                 background:
                   metric === pill.value
-                    ? 'linear-gradient(135deg, #2563EB, #3B82F6)'
+                    ? 'var(--ink)'
                     : 'transparent',
                 color:
                   metric === pill.value

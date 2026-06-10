@@ -4,109 +4,112 @@
 
 /* ─── Shadcn HSL tokens ──────────────────────────────────────────────────── */
 :root {
-  --background:              40 35% 91%;
-  --foreground:              25 60% 12%;
-  --card:                    40 30% 96%;
-  --card-foreground:         25 60% 12%;
-  --popover:                 40 30% 96%;
-  --popover-foreground:      25 60% 12%;
-  --primary:                 201 90% 35%;
-  --primary-foreground:      40 35% 96%;
-  --secondary:               35 25% 84%;
-  --secondary-foreground:    25 50% 18%;
-  --muted:                   35 20% 82%;
-  --muted-foreground:        25 30% 40%;
-  --accent:                  35 20% 82%;
-  --accent-foreground:       25 60% 12%;
+  --background:              0 0% 100%;
+  --foreground:              0 0% 10%;
+  --card:                    0 0% 100%;
+  --card-foreground:         0 0% 10%;
+  --popover:                 0 0% 100%;
+  --popover-foreground:      0 0% 10%;
+  --primary:                 0 0% 10%;
+  --primary-foreground:      0 0% 100%;
+  --secondary:               0 0% 94%;
+  --secondary-foreground:    0 0% 16%;
+  --muted:                   0 0% 92%;
+  --muted-foreground:        0 0% 38%;
+  --accent:                  0 0% 94%;
+  --accent-foreground:       0 0% 10%;
   --destructive:             0 72% 45%;
   --destructive-foreground:  0 0% 100%;
-  --border:                  30 25% 72%;
-  --input:                   35 20% 82%;
-  --ring:                    201 90% 35%;
-  --radius:                  0.375rem;
+  --border:                  0 0% 55%;
+  --input:                   0 0% 88%;
+  --ring:                    0 0% 10%;
+  --radius:                  0.25rem;
 
-  /* ── Xen design tokens — light (parchment) ── */
-  --bg-base:        #F5EDD8;
-  --bg-secondary:   #EDE4C8;
-  --bg-card:        #FDFAF2;
-  --bg-elevated:    #F0E8D0;
-  --bg-panel:       #EBE0C8;
-  --bg-muted:       #E0D4B8;
-  --bg-navy:        #1E130A;
+  /* ── Xen design tokens — light (white paper, black ink) ── */
+  --bg-base:        #FFFFFF;
+  --bg-secondary:   #FAFAFA;
+  --bg-card:        #FFFFFF;
+  --bg-elevated:    #F5F5F5;
+  --bg-panel:       #F0F0F0;
+  --bg-muted:       #EBEBEB;
+  --bg-navy:        #141414;
 
-  --accent-primary: #0369A1;
-  --accent-bright:  #0284C7;
-  --accent-deep:    #075985;
-  --accent-text:    #FDFAF2;
-  --accent-glow:    rgba(3,105,161,0.15);
-  --accent-pale:    #E0F2FE;
+  --accent-primary: #141414;
+  --accent-bright:  #000000;
+  --accent-deep:    #000000;
+  --accent-text:    #FFFFFF;
+  --accent-glow:    rgba(0,0,0,0.08);
+  --accent-pale:    #F5F5F5;
 
-  --text-primary:   #1E130A;
-  --text-secondary: #4A3020;
-  --text-muted:     #7A5A40;
+  --text-primary:   #141414;
+  --text-secondary: #333333;
+  --text-muted:     #5E5E5E;
 
-  --border-soft:    rgba(74,48,32,0.15);
-  --border-strong:  rgba(74,48,32,0.30);
-  --border-active:  #0369A1;
+  --border-soft:    rgba(20,20,20,0.30);
+  --border-strong:  rgba(20,20,20,0.60);
+  --border-active:  #141414;
 
   --xen-red:        #B91C1C;
-  --xen-green:      #15803D;
-  --xen-amber:      #92400E;
+  --xen-green:      #141414;
+  --xen-amber:      #141414;
 
   /* hand-drawn offsets for uneven borders */
-  --sketch-r: 2px 7px 4px 6px / 5px 3px 7px 4px;
+  --sketch-r: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  --ink: #141414;
+  --paper: #FFFFFF;
 }
 
-/* ─── Dark theme ─────────────────────────────────────────────────────────── */
+/* ─── Dark theme — black paper, white ink ────────────────────────────────── */
 .dark {
-  --background:              25 15% 8%;
-  --foreground:              40 20% 92%;
-  --card:                    25 12% 11%;
-  --card-foreground:         40 20% 92%;
-  --popover:                 25 12% 10%;
-  --popover-foreground:      40 20% 92%;
-  --primary:                 199 92% 60%;
-  --primary-foreground:      0 0% 4%;
-  --secondary:               25 10% 18%;
-  --secondary-foreground:    40 15% 65%;
-  --muted:                   25 10% 18%;
-  --muted-foreground:        40 10% 48%;
-  --accent:                  25 10% 18%;
-  --accent-foreground:       40 20% 92%;
+  --background:              0 0% 7%;
+  --foreground:              0 0% 96%;
+  --card:                    0 0% 9%;
+  --card-foreground:         0 0% 96%;
+  --popover:                 0 0% 8%;
+  --popover-foreground:      0 0% 96%;
+  --primary:                 0 0% 96%;
+  --primary-foreground:      0 0% 7%;
+  --secondary:               0 0% 15%;
+  --secondary-foreground:    0 0% 70%;
+  --muted:                   0 0% 15%;
+  --muted-foreground:        0 0% 55%;
+  --accent:                  0 0% 15%;
+  --accent-foreground:       0 0% 96%;
   --destructive:             0 72% 71%;
   --destructive-foreground:  0 0% 100%;
-  --border:                  25 10% 20%;
-  --input:                   25 10% 18%;
-  --ring:                    199 92% 60%;
+  --border:                  0 0% 45%;
+  --input:                   0 0% 15%;
+  --ring:                    0 0% 96%;
 
-  --bg-base:        #1C1714;
-  --bg-secondary:   #221D18;
-  --bg-card:        #2A2320;
-  --bg-elevated:    #302820;
-  --bg-panel:       #282018;
-  --bg-muted:       #383028;
-  --bg-navy:        #1C1714;
+  --bg-base:        #121212;
+  --bg-secondary:   #171717;
+  --bg-card:        #121212;
+  --bg-elevated:    #1E1E1E;
+  --bg-panel:       #1A1A1A;
+  --bg-muted:       #262626;
+  --bg-navy:        #121212;
 
-  --accent-primary: #38BDF8;
-  --accent-bright:  #7DD3FC;
-  --accent-deep:    #0EA5E9;
-  --accent-text:    #0A0A0A;
-  --accent-glow:    rgba(56,189,248,0.20);
-  --accent-pale:    #E0F2FE;
+  --accent-primary: #F5F5F5;
+  --accent-bright:  #FFFFFF;
+  --accent-deep:    #E5E5E5;
+  --accent-text:    #121212;
+  --accent-glow:    rgba(255,255,255,0.10);
+  --accent-pale:    #1E1E1E;
 
-  --text-primary:   #F0E8D8;
-  --text-secondary: #C4A882;
-  --text-muted:     #8A7560;
+  --text-primary:   #F5F5F5;
+  --text-secondary: #D4D4D4;
+  --text-muted:     #969696;
 
-  --border-soft:    rgba(255,235,200,0.08);
-  --border-strong:  rgba(255,235,200,0.16);
-  --border-active:  #38BDF8;
+  --border-soft:    rgba(245,245,245,0.30);
+  --border-strong:  rgba(245,245,245,0.60);
+  --border-active:  #F5F5F5;
 
   --xen-red:        #F87171;
-  --xen-green:      #4ADE80;
-  --xen-amber:      #FBBF24;
+  --xen-green:      #F5F5F5;
+  --xen-amber:      #F5F5F5;
 
-  --sketch-r: 2px 7px 4px 6px / 5px 3px 7px 4px;
+  --ink: #F5F5F5;
+  --paper: #121212;
 }
 
 /* ─── Base styles ────────────────────────────────────────────────────────── */
@@ -120,75 +123,67 @@
   body {
     background-color: var(--bg-base);
     color: var(--text-primary);
+    font-family: var(--font-display), 'Just Me Again Down Here', cursive;
+    font-size: 18px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    font-feature-settings: "rlig" 1, "calt" 1;
     transition: background-color 0.2s ease, color 0.2s ease;
   }
 
-  h1, h2, h3, h4 {
-    font-family: var(--font-display), 'Caveat', cursive;
-    font-weight: 700;
-    letter-spacing: -0.01em;
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display), 'Just Me Again Down Here', cursive;
+    font-weight: 400;
+    letter-spacing: 0.01em;
   }
 
-  h5, h6 {
-    font-family: var(--font-display), 'Caveat', cursive;
-    font-weight: 600;
-  }
-
-  p, span, a, button, input, label, li {
-    font-family: var(--font-display), 'Caveat', cursive;
+  p, span, a, button, input, textarea, select, label, li, td, th {
+    font-family: var(--font-display), 'Just Me Again Down Here', cursive;
   }
 }
 
 /* ─── Utility classes ────────────────────────────────────────────────────── */
 @layer utilities {
-  /* Glow */
-  .glow-xs { box-shadow: 0 0 16px var(--accent-glow); }
-  .glow-sm { box-shadow: 0 0 28px var(--accent-glow); }
-  .glow    { box-shadow: 0 0 40px var(--accent-glow); }
-  .glow-lg { box-shadow: 0 0 60px var(--accent-glow); }
-
-  /* aliases */
-  .glow-yellow-xs, .glow-green-xs { box-shadow: 0 0 16px var(--accent-glow); }
-  .glow-yellow-sm, .glow-green-sm { box-shadow: 0 0 28px var(--accent-glow); }
-  .glow-yellow,    .glow-green    { box-shadow: 0 0 40px var(--accent-glow); }
-  .glow-yellow-lg, .glow-green-lg { box-shadow: 0 0 60px var(--accent-glow); }
+  /* Glow (kept as soft ink shadows) */
+  .glow-xs, .glow-yellow-xs, .glow-green-xs { box-shadow: 0 0 16px var(--accent-glow); }
+  .glow-sm, .glow-yellow-sm, .glow-green-sm { box-shadow: 0 0 28px var(--accent-glow); }
+  .glow,    .glow-yellow,    .glow-green    { box-shadow: 0 0 40px var(--accent-glow); }
+  .glow-lg, .glow-yellow-lg, .glow-green-lg { box-shadow: 0 0 60px var(--accent-glow); }
 
   .border-glow-green {
-    border-color: var(--border-active) !important;
-    box-shadow: 2px 2px 0 var(--border-active);
+    border-color: var(--ink) !important;
+    box-shadow: 2px 2px 0 var(--ink);
   }
+
+  /* sketch card — the drawn-box style from the reference image */
+  .sketch-card {
+    background: var(--bg-card);
+    border: 2px solid var(--ink);
+    box-shadow: 3px 3px 0 var(--ink);
+    border-radius: 4px;
+    filter: url(#hand-draw);
+  }
+
+  .sketch-panel {
+    background: var(--bg-card);
+    border: 2px solid var(--ink);
+    box-shadow: 2px 2px 0 var(--ink);
+    border-radius: 4px;
+    filter: url(#hand-draw);
+  }
+
+  /* wobbly drawn line — use on a span to draw borders without filtering the container */
+  .sketch-line {
+    background: var(--ink);
+    filter: url(#hand-draw-lg);
+  }
+
+  .sketchy { border-radius: 4px; filter: url(#hand-draw); }
 
   /* paper texture overlay */
   .paper-texture {
     background-image:
       url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
   }
-
-  /* sketchy border radius helper */
-  .sketchy { border-radius: var(--sketch-r); }
-
-  /* sketch card — drawn box style used on cards/panels */
-  .sketch-card {
-    background: var(--bg-card);
-    border: 2px solid var(--text-primary);
-    box-shadow: 3px 3px 0 var(--text-primary);
-    border-radius: 3px;
-    filter: url(#hand-draw);
-  }
-
-  .sketch-panel {
-    background: var(--bg-elevated);
-    border: 2px solid var(--border-strong);
-    box-shadow: 2px 2px 0 var(--border-strong);
-    border-radius: 3px;
-    filter: url(#hand-draw);
-  }
-
-  /* font-display override — Caveat everywhere */
-  .font-display { font-family: var(--font-display), 'Caveat', cursive; }
 
   /* Shimmer */
   .shimmer {
@@ -209,17 +204,13 @@
   /* Text */
   .text-balance  { text-wrap: balance; }
   .tabular-nums  { font-variant-numeric: tabular-nums; }
-  .font-display  { font-family: var(--font-display), 'Anton', sans-serif; }
+  .font-display  { font-family: var(--font-display), 'Just Me Again Down Here', cursive; }
 
   /* Scrollbar */
   .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   .hide-scrollbar::-webkit-scrollbar { display: none; }
 
   /* Progress */
-  .progress-yellow {
-    background: var(--accent-primary);
-  }
-  .progress-green {
-    background: var(--accent-primary);
-  }
+  .progress-yellow { background: var(--accent-primary); }
+  .progress-green  { background: var(--accent-primary); }
 }
