@@ -3,22 +3,23 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { useAccount } from 'wagmi'
+import { Rss, TrendingUp, PlusCircle, Gift, User, Activity, Settings } from 'lucide-react'
 import { WalletButton } from '@/components/wallet/WalletButton'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { usePortfolioBalance } from '@/hooks/usePortfolioBalance'
 import { cn } from '@/lib/utils'
 
 const NAV_PRIMARY = [
-  { href: '/feed',    label: 'Feed'    },
-  { href: '/markets', label: 'Markets' },
-  { href: '/create',  label: 'Create'  },
-  { href: '/claims',  label: 'Claims'  },
-  { href: '/profile', label: 'Profile' },
+  { href: '/feed',    label: 'Feed',    icon: Rss         },
+  { href: '/markets', label: 'Markets', icon: TrendingUp  },
+  { href: '/create',  label: 'Create',  icon: PlusCircle  },
+  { href: '/claims',  label: 'Claims',  icon: Gift        },
+  { href: '/profile', label: 'Profile', icon: User        },
 ]
 
 const NAV_SECONDARY = [
-  { href: '/activity', label: 'Activity' },
-  { href: '/settings', label: 'Settings' },
+  { href: '/activity', label: 'Activity', icon: Activity },
+  { href: '/settings', label: 'Settings', icon: Settings },
 ]
 
 async function safeJson(res: Response) {
@@ -80,13 +81,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               key={n.href}
               href={n.href}
               className={cn(
-                'block px-3 py-2.5 rounded-[12px] text-[14px] font-medium transition-all duration-150',
+                'flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-[14px] font-medium transition-all duration-150',
                 isActive(n.href)
                   ? 'bg-[var(--accent-primary)]/[0.10] text-[var(--accent-primary)]'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]'
               )}
             >
-              {n.label}
+              <n.icon size={15} strokeWidth={2.2} className="shrink-0" />
+              <span>{n.label}</span>
             </Link>
           ))}
 
@@ -96,13 +98,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 key={n.href}
                 href={n.href}
                 className={cn(
-                  'block px-3 py-2.5 rounded-[12px] text-[14px] font-medium transition-all duration-150',
+                  'flex items-center gap-2.5 px-3 py-2.5 rounded-[12px] text-[14px] font-medium transition-all duration-150',
                   isActive(n.href)
                     ? 'bg-[var(--accent-primary)]/[0.10] text-[var(--accent-primary)]'
                     : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]'
                 )}
               >
-                {n.label}
+                <n.icon size={15} strokeWidth={2.2} className="shrink-0" />
+                <span>{n.label}</span>
               </Link>
             ))}
           </div>
@@ -178,10 +181,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     : 'text-[var(--text-muted)]'
                 )}
               >
+                <n.icon size={20} strokeWidth={2} />
                 <span className="text-[11px] font-medium tracking-wide">{n.label}</span>
-                {isActive(n.href) && (
-                  <span className="h-[2px] w-4 rounded-full bg-[var(--accent-primary)]" />
-                )}
               </Link>
             ))}
           </div>

@@ -1,5 +1,6 @@
 'use client'
 import { useTheme } from 'next-themes'
+import { Sun, Moon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface ThemeToggleProps {
@@ -13,22 +14,19 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
   return (
     <button
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
+      aria-label="Toggle theme"
       className={cn(
-        'flex items-center gap-1.5 px-2.5 py-1.5 rounded-[10px]',
-        'text-[12px] font-medium',
+        'flex items-center justify-center w-9 h-9 rounded-[var(--sketch-r)]',
         'border border-[var(--border-strong)]',
         'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]',
         'transition-colors',
         className
       )}
     >
-      <span className={cn('transition-colors', !isDark ? 'text-[var(--accent-primary)] font-semibold' : '')}>
-        Light
-      </span>
-      <span className="text-[var(--border-strong)]">/</span>
-      <span className={cn('transition-colors', isDark ? 'text-[var(--accent-primary)] font-semibold' : '')}>
-        Dark
-      </span>
+      {isDark
+        ? <Sun  size={16} strokeWidth={2.5} />
+        : <Moon size={16} strokeWidth={2.5} />
+      }
     </button>
   )
 }

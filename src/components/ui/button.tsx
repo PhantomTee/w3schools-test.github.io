@@ -10,23 +10,23 @@ const buttonVariants = cva(
       variant: {
         // Primary — black in light mode, yellow in dark mode
         primary:
-          'bg-[var(--accent-primary)] text-[var(--accent-text)] hover:opacity-85 active:scale-[0.98] rounded-[8px]',
+          'bg-[var(--accent-primary)] text-[var(--accent-text)] hover:opacity-85 active:scale-[0.98] rounded-[var(--sketch-r)]',
         xen:
-          'bg-[var(--accent-primary)] text-[var(--accent-text)] hover:opacity-85 active:scale-[0.98] rounded-[8px]',
+          'bg-[var(--accent-primary)] text-[var(--accent-text)] hover:opacity-85 active:scale-[0.98] rounded-[var(--sketch-r)]',
         default:
-          'bg-[var(--accent-primary)] text-[var(--accent-text)] hover:opacity-85 active:scale-[0.98] rounded-[8px]',
+          'bg-[var(--accent-primary)] text-[var(--accent-text)] hover:opacity-85 active:scale-[0.98] rounded-[var(--sketch-r)]',
         // Secondary — elevated surface
         secondary:
-          'bg-[var(--bg-elevated)] text-[var(--text-secondary)] border border-[var(--border-soft)] hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)] hover:border-[var(--border-strong)] active:scale-[0.98] rounded-[8px]',
+          'bg-[var(--bg-elevated)] text-[var(--text-secondary)] border border-[var(--border-soft)] hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)] hover:border-[var(--border-strong)] active:scale-[0.98] rounded-[var(--sketch-r)]',
         // Outline
         outline:
-          'bg-transparent border border-[var(--border-strong)] text-[var(--text-primary)] hover:bg-[var(--accent-primary)]/10 hover:border-[var(--accent-primary)] active:scale-[0.98] rounded-[8px]',
+          'bg-transparent border border-[var(--border-strong)] text-[var(--text-primary)] hover:bg-[var(--accent-primary)]/10 hover:border-[var(--accent-primary)] active:scale-[0.98] rounded-[var(--sketch-r)]',
         // Ghost
         ghost:
-          'text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] rounded-[8px]',
+          'text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] rounded-[var(--sketch-r)]',
         // Destructive
         destructive:
-          'bg-[var(--xen-red)]/10 text-[var(--xen-red)] border border-[var(--xen-red)]/20 hover:bg-[var(--xen-red)]/15 rounded-[8px]',
+          'bg-[var(--xen-red)]/10 text-[var(--xen-red)] border border-[var(--xen-red)]/20 hover:bg-[var(--xen-red)]/15 rounded-[var(--sketch-r)]',
         // Link
         link:
           'text-[var(--accent-primary)] underline-offset-4 hover:underline p-0 h-auto',
