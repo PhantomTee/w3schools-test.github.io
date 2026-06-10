@@ -139,27 +139,27 @@ export default function CreateMarketPage() {
     <AppShell>
       <div className="px-5 sm:px-8 py-8 max-w-2xl mx-auto space-y-6">
 
-        {/* Back */}
-        <div className="flex items-center gap-3">
-          <Link href="/profile" className="text-[13px] text-[#64748B] hover:text-[var(--text-muted)] transition-colors">
+        {/* Breadcrumb */}
+        <div className="flex items-center gap-3 text-[16px]">
+          <Link href="/profile" className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors">
             Profile
           </Link>
-          <span className="text-[#64748B]">/</span>
-          <span className="text-[13px] text-[var(--text-muted)]">Create Market</span>
+          <span className="text-[var(--text-muted)]">/</span>
+          <span className="text-[var(--text-primary)]">Create Market</span>
         </div>
 
         <div>
-          <h1 className="text-[24px] font-semibold text-[#F8FAFC] tracking-tight mb-1">Create Market</h1>
-          <p className="text-[14px] text-[#64748B]">GenLayer designs fair, time-aware ranges for your tweet</p>
+          <h1 className="text-[34px] text-[var(--text-primary)] leading-tight mb-1">Create Market</h1>
+          <p className="text-[18px] text-[var(--text-muted)]">GenLayer designs fair, time-aware ranges for your tweet</p>
         </div>
 
         {/* Tweet preview */}
         {tweetLoading ? (
-          <div className="h-36 rounded-[24px] shimmer" />
+          <div className="h-36 sketch-card animate-pulse" />
         ) : tweet ? (
-          <div className={`rounded-[24px] border p-5 ${tweet.eligible ? 'bg-[#0B1220] border-[rgba(59,130,246,0.18)]' : 'bg-[#080D14] border-white/[0.04]'}`}>
-            <p className="text-[14px] leading-relaxed text-[#F8FAFC] mb-4">{tweet.text}</p>
-            <div className="grid grid-cols-4 gap-3 py-3 border-y border-white/[0.05] mb-3">
+          <div className={`sketch-card p-5 ${!tweet.eligible ? 'opacity-60' : ''}`}>
+            <p className="text-[17px] leading-relaxed text-[var(--text-primary)] mb-4">{tweet.text}</p>
+            <div className="grid grid-cols-4 gap-3 py-3 border-y-2 border-[var(--border-soft)] mb-3">
               {[
                 { label: 'Views',   value: tweet.normalizedMetrics?.views != null ? formatCount(tweet.normalizedMetrics.views) : 'N/A' },
                 { label: 'Likes',   value: formatCount(tweet.normalizedMetrics?.likes ?? 0) },
@@ -167,17 +167,17 @@ export default function CreateMarketPage() {
                 { label: 'Replies', value: formatCount(tweet.normalizedMetrics?.replies ?? 0) },
               ].map(({ label, value }) => (
                 <div key={label} className="text-center">
-                  <p className="text-[13px] font-semibold text-[#F8FAFC] tabular-nums">{value}</p>
-                  <p className="text-[11px] text-[#64748B] mt-0.5">{label}</p>
+                  <p className="text-[17px] text-[var(--text-primary)] tabular-nums">{value}</p>
+                  <p className="text-[14px] text-[var(--text-muted)] mt-0.5">{label}</p>
                 </div>
               ))}
             </div>
-            <div className="flex items-center justify-between text-[13px]">
-              <span className="text-[#64748B]">Posted {formatAge(tweet.created_at)} ago</span>
+            <div className="flex items-center justify-between text-[15px]">
+              <span className="text-[var(--text-muted)]">Posted {formatAge(tweet.created_at)} ago</span>
               {tweet.eligible ? (
-                <span className="text-[var(--ink)]">Eligible</span>
+                <span className="text-[var(--text-primary)]">Eligible</span>
               ) : (
-                <span className="text-[#EF4444]">{tweet.eligibilityNote}</span>
+                <span className="text-[var(--xen-red)]">{tweet.eligibilityNote}</span>
               )}
             </div>
           </div>
@@ -185,19 +185,19 @@ export default function CreateMarketPage() {
 
         {/* Step 1: Configuration */}
         {(step === 'config' || step === 'error') && tweet?.eligible && (
-          <div className="rounded-[24px] bg-[#0B1220] border border-white/[0.06] p-6 space-y-5">
-            <h2 className="text-[16px] font-semibold text-[#F8FAFC]">Market configuration</h2>
+          <div className="sketch-card p-6 space-y-5">
+            <h2 className="text-[22px] text-[var(--text-primary)]">Market configuration</h2>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="text-[12px] text-[#64748B]">Metric</Label>
+                <Label className="text-[16px] text-[var(--text-muted)]">Metric</Label>
                 <Select value={metric} onValueChange={v => setMetric(v as MetricType)}>
-                  <SelectTrigger className="bg-[#080D14] border-white/[0.08] text-[#F8FAFC] rounded-[12px]">
+                  <SelectTrigger className="bg-[var(--bg-card)] border-[var(--ink)] text-[var(--text-primary)] rounded-[4px] text-[16px]">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#0B1220] border-white/[0.08] rounded-[16px]">
+                  <SelectContent className="bg-[var(--bg-card)] border-[var(--ink)] rounded-[4px]">
                     {METRIC_OPTIONS.filter(o => o.available).map(o => (
-                      <SelectItem key={o.value} value={o.value} className="text-[#F8FAFC] focus:bg-white/[0.06]">
+                      <SelectItem key={o.value} value={o.value} className="text-[var(--text-primary)] text-[16px]">
                         {o.label}
                       </SelectItem>
                     ))}
@@ -205,14 +205,14 @@ export default function CreateMarketPage() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label className="text-[12px] text-[#64748B]">Duration</Label>
+                <Label className="text-[16px] text-[var(--text-muted)]">Duration</Label>
                 <Select value={String(duration)} onValueChange={v => setDuration(Number(v))}>
-                  <SelectTrigger className="bg-[#080D14] border-white/[0.08] text-[#F8FAFC] rounded-[12px]">
+                  <SelectTrigger className="bg-[var(--bg-card)] border-[var(--ink)] text-[var(--text-primary)] rounded-[4px] text-[16px]">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#0B1220] border-white/[0.08] rounded-[16px]">
+                  <SelectContent className="bg-[var(--bg-card)] border-[var(--ink)] rounded-[4px]">
                     {DURATION_OPTIONS.map(o => (
-                      <SelectItem key={o.value} value={String(o.value)} className="text-[#F8FAFC] focus:bg-white/[0.06]">
+                      <SelectItem key={o.value} value={String(o.value)} className="text-[var(--text-primary)] text-[16px]">
                         {o.label}
                       </SelectItem>
                     ))}
@@ -222,48 +222,48 @@ export default function CreateMarketPage() {
             </div>
 
             {step === 'error' && error && (
-              <p className="text-[13px] text-[#EF4444] bg-[#EF4444]/[0.08] rounded-[12px] p-4">{error}</p>
+              <p className="text-[16px] text-[var(--xen-red)] border-2 border-[var(--xen-red)] rounded-[4px] p-4">{error}</p>
             )}
 
-            <div className="flex items-center justify-between pt-2 border-t border-white/[0.05]">
+            <div className="flex items-center justify-between pt-2 border-t-2 border-[var(--border-soft)]">
               <div>
-                <p className="text-[13px] text-[#64748B]">Creation fee</p>
-                <p className="text-[15px] font-semibold text-[#F8FAFC]">0.5 USDC</p>
+                <p className="text-[15px] text-[var(--text-muted)]">Creation fee</p>
+                <p className="text-[20px] text-[var(--text-primary)]">0.5 USDC</p>
               </div>
-              <Button variant="xen" onClick={handleGenerate} disabled={!address}>
+              <Button variant="filled" onClick={handleGenerate} disabled={!address}>
                 Generate Ranges with GenLayer
               </Button>
             </div>
             {!address && (
-              <p className="text-[12px] text-[#64748B]">Connect your wallet to create markets</p>
+              <p className="text-[16px] text-[var(--text-muted)]">Connect your wallet to create markets</p>
             )}
           </div>
         )}
 
         {/* Step 2: Generating */}
         {step === 'generating' && (
-          <div className="rounded-[24px] bg-[#0B1220] border border-white/[0.06] p-10 text-center space-y-3">
-            <div className="w-full h-[2px] bg-[#101827] rounded-full overflow-hidden mb-6">
-              <div className="h-full bg-gradient-to-r from-transparent via-[var(--ink)] to-transparent animate-[shimmer_1.6s_infinite] w-1/2" />
+          <div className="sketch-card p-10 text-center space-y-3">
+            <div className="w-full h-[3px] bg-[var(--bg-elevated)] rounded-full overflow-hidden mb-6">
+              <div className="h-full bg-[var(--ink)] animate-[shimmer_1.6s_infinite] w-1/2" />
             </div>
-            <p className="text-[16px] font-semibold text-[#F8FAFC]">GenLayer is designing time-aware ranges</p>
-            <p className="text-[13px] text-[#64748B]">Analysing tweet velocity, age, and selected duration.</p>
+            <p className="text-[20px] text-[var(--text-primary)]">GenLayer is designing time-aware ranges</p>
+            <p className="text-[17px] text-[var(--text-muted)]">Analysing tweet velocity, age, and selected duration.</p>
           </div>
         )}
 
         {/* Step 3: Review */}
         {step === 'review' && design && (
           <div className="space-y-4">
-            <div className="rounded-[24px] bg-[#0B1220] border border-white/[0.06] p-6 space-y-5">
+            <div className="sketch-card p-6 space-y-5">
               <div className="flex items-center justify-between">
-                <h2 className="text-[16px] font-semibold text-[#F8FAFC]">GenLayer market design</h2>
+                <h2 className="text-[22px] text-[var(--text-primary)]">GenLayer market design</h2>
                 <Badge variant={guardResult?.approved ? 'green' : 'red'}>
                   {guardResult?.approved ? 'Approved' : 'Rejected'}
                 </Badge>
               </div>
 
               {design.reason && (
-                <p className="text-[13px] text-[#64748B] leading-relaxed bg-[#080D14] rounded-[12px] p-4">
+                <p className="text-[16px] text-[var(--text-muted)] leading-relaxed sketch-panel p-4">
                   {design.reason}
                 </p>
               )}
@@ -274,55 +274,55 @@ export default function CreateMarketPage() {
                   { label: 'Duration', value: `${design.durationHours}h` },
                   { label: 'Start',    value: formatCount(design.startValue) },
                 ].map(({ label, value }) => (
-                  <div key={label} className="p-3 rounded-[12px] bg-[#080D14] text-center">
-                    <p className="text-[13px] font-semibold text-[#F8FAFC]">{value}</p>
-                    <p className="text-[11px] text-[#64748B] mt-0.5">{label}</p>
+                  <div key={label} className="sketch-panel p-3 text-center">
+                    <p className="text-[18px] text-[var(--text-primary)] tabular-nums">{value}</p>
+                    <p className="text-[14px] text-[var(--text-muted)] mt-0.5">{label}</p>
                   </div>
                 ))}
               </div>
 
               <div className="space-y-2">
-                <p className="text-[12px] text-[#64748B] uppercase tracking-wider mb-3">Generated ranges</p>
+                <p className="text-[14px] text-[var(--text-muted)] uppercase tracking-wider mb-3">Generated ranges</p>
                 {design.ranges.map((r: any, i: number) => (
-                  <div key={i} className="flex items-center justify-between p-3 rounded-[12px] border border-white/[0.05] bg-[#080D14]">
-                    <span className="text-[14px] font-medium text-[#F8FAFC]">{r.label}</span>
+                  <div key={i} className="flex items-center justify-between p-3 rounded-[4px] border-2 border-[var(--border-soft)]">
+                    <span className="text-[18px] text-[var(--text-primary)]">{r.label}</span>
                     <div className="flex items-center gap-3">
-                      <div className="w-16 h-[3px] rounded-full bg-white/[0.06] overflow-hidden">
+                      <div className="w-16 h-[3px] rounded-full bg-[var(--border-soft)] overflow-hidden">
                         <div className="h-full rounded-full bg-[var(--ink)]" style={{ width: `${r.difficulty * 10}%` }} />
                       </div>
-                      <span className="text-[12px] text-[#64748B] w-16 text-right">
-                        Difficulty {r.difficulty}/10
+                      <span className="text-[14px] text-[var(--text-muted)] w-20 text-right">
+                        {r.difficulty}/10
                       </span>
                     </div>
                   </div>
                 ))}
               </div>
 
-              <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/[0.05] text-[13px]">
+              <div className="grid grid-cols-2 gap-4 pt-4 border-t-2 border-[var(--border-soft)]">
                 <div>
-                  <p className="text-[12px] text-[#64748B] mb-1">Market quality</p>
-                  <p className="text-[#F8FAFC] font-medium">{design.qualityScore >= 7 ? 'High' : design.qualityScore >= 4 ? 'Medium' : 'Low'}</p>
+                  <p className="text-[15px] text-[var(--text-muted)] mb-1">Market quality</p>
+                  <p className="text-[18px] text-[var(--text-primary)]">{design.qualityScore >= 7 ? 'High' : design.qualityScore >= 4 ? 'Medium' : 'Low'}</p>
                 </div>
                 <div>
-                  <p className="text-[12px] text-[#64748B] mb-1">Manipulation risk</p>
-                  <p className="text-[#F8FAFC] font-medium">{design.riskScore <= 3 ? 'Low' : design.riskScore <= 6 ? 'Medium' : 'High'}</p>
+                  <p className="text-[15px] text-[var(--text-muted)] mb-1">Manipulation risk</p>
+                  <p className="text-[18px] text-[var(--text-primary)]">{design.riskScore <= 3 ? 'Low' : design.riskScore <= 6 ? 'Medium' : 'High'}</p>
                 </div>
               </div>
 
-              <div className="rounded-[12px] bg-[#080D14] p-4 text-[13px] text-[#64748B]">
-                <span className="text-[var(--text-muted)]">Question: </span>
+              <div className="sketch-panel p-4 text-[16px] text-[var(--text-muted)]">
+                <span className="text-[var(--text-primary)]">Question: </span>
                 "What will this tweet's final total {metricLabel(metric).toLowerCase()} be after {duration} hour{duration !== 1 ? 's' : ''}?"
               </div>
             </div>
 
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-[12px] text-[#64748B]">Creation fee</p>
-                <p className="text-[15px] font-semibold text-[#F8FAFC]">0.5 USDC</p>
+                <p className="text-[15px] text-[var(--text-muted)]">Creation fee</p>
+                <p className="text-[20px] text-[var(--text-primary)]">0.5 USDC</p>
               </div>
               <div className="flex gap-3">
-                <Button variant="outline" onClick={() => setStep('config')}>Back</Button>
-                <Button variant="xen" onClick={handleCreate}>
+                <Button variant="xen" onClick={() => setStep('config')}>Back</Button>
+                <Button variant="filled" onClick={handleCreate}>
                   {(allowance ?? 0n) < CREATION_FEE_RAW ? 'Approve and Create Market' : 'Create Market'}
                 </Button>
               </div>
@@ -332,31 +332,31 @@ export default function CreateMarketPage() {
 
         {/* Step 4: Approving / creating */}
         {(step === 'approving' || step === 'creating') && (
-          <div className="rounded-[24px] bg-[#0B1220] border border-white/[0.06] p-10 text-center space-y-3">
-            <div className="w-full h-[2px] bg-[#101827] rounded-full overflow-hidden mb-6">
-              <div className="h-full bg-gradient-to-r from-transparent via-[var(--ink)] to-transparent animate-[shimmer_1.6s_infinite] w-1/2" />
+          <div className="sketch-card p-10 text-center space-y-3">
+            <div className="w-full h-[3px] bg-[var(--bg-elevated)] rounded-full overflow-hidden mb-6">
+              <div className="h-full bg-[var(--ink)] animate-[shimmer_1.6s_infinite] w-1/2" />
             </div>
-            <p className="text-[16px] font-semibold text-[#F8FAFC]">
-              {step === 'approving' ? 'Approving USDC...' : 'Creating market on Arc...'}
+            <p className="text-[20px] text-[var(--text-primary)]">
+              {step === 'approving' ? 'Approving USDC…' : 'Creating market on Arc…'}
             </p>
-            <p className="text-[13px] text-[#64748B]">Confirm the transaction in your wallet.</p>
+            <p className="text-[17px] text-[var(--text-muted)]">Confirm the transaction in your wallet.</p>
           </div>
         )}
 
         {/* Step 5: Done */}
         {step === 'done' && (
-          <div className="rounded-[24px] bg-[#0B1220] border border-[rgba(34,197,94,0.25)] p-10 text-center space-y-4">
-            <div className="text-[40px] font-semibold text-[var(--ink)] mb-2">Market created</div>
-            <p className="text-[14px] text-[#64748B]">
+          <div className="sketch-card p-10 text-center space-y-4">
+            <div className="text-[40px] text-[var(--text-primary)] mb-2">Market created</div>
+            <p className="text-[18px] text-[var(--text-muted)]">
               Your {metricLabel(metric)} prediction market is live for {duration} hour{duration !== 1 ? 's' : ''}.
               Traders can now stake USDC on ranges.
             </p>
             <div className="flex gap-3 justify-center pt-2">
               <Link href={`/market/${createdMarketId}`}>
-                <Button variant="xen">View Market</Button>
+                <Button variant="filled">View Market</Button>
               </Link>
               <Link href="/profile">
-                <Button variant="outline">Back to Profile</Button>
+                <Button variant="xen">Back to Profile</Button>
               </Link>
             </div>
           </div>

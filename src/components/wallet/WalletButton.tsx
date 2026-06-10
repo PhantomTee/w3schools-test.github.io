@@ -20,7 +20,7 @@ export function WalletButton() {
   const [showSignIn, setShowSignIn] = useState(false)
   const qc = useQueryClient()
 
-  const { data: me } = useQuery({
+  const { data: me, isLoading: meLoading } = useQuery({
     queryKey:  ['me'],
     queryFn:   async () => {
       const res = await fetch('/api/auth/me')
@@ -33,14 +33,16 @@ export function WalletButton() {
 
   const isAuthed = !!me?.user?.walletAddress
 
-  // Show sign-in popup when wallet connects but not yet authenticated
+  // Only show sign-in modal once the session query has settled — avoids
+  // flashing the modal on page load while the cookie check is in-flight.
   useEffect(() => {
+    if (meLoading) return
     if (isConnected && !isAuthed) {
       setShowSignIn(true)
     } else {
       setShowSignIn(false)
     }
-  }, [isConnected, isAuthed])
+  }, [isConnected, isAuthed, meLoading])
 
   async function handleSignIn() {
     if (!address) return
