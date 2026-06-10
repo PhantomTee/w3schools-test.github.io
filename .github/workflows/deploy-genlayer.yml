@@ -1,0 +1,52 @@
+name: Deploy GenLayer Contract
+
+on:
+  workflow_dispatch:
+    inputs:
+      genlayer_node_url:
+        description: 'GenLayer RPC URL (leave blank for default Studionet)'
+        required: false
+        default: ''
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Deploy XenMarketAI to GenLayer Studionet
+        id: deploy
+        env:
+          # If GENLAYER_DEPLOYER_KEY is not set, the script generates a fresh
+          # wallet, masks it, and prints it for you to save as the secret.
+          GENLAYER_DEPLOYER_KEY: ${{ secrets.GENLAYER_DEPLOYER_KEY }}
+          GENLAYER_NODE_URL: ${{ inputs.genlayer_node_url || secrets.GENLAYER_NODE_URL }}
+        run: node scripts/deploy-genlayer.mjs
+
+      - name: Job summary
+        if: always()
+        run: |
+          echo "## GenLayer Deployment" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -n "${{ steps.deploy.outputs.contract_address }}" ]; then
+            echo "✅ **Deployed successfully**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "| Field | Value |" >> $GITHUB_STEP_SUMMARY
+            echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+            echo "| Contract | \`${{ steps.deploy.outputs.contract_address }}\` |" >> $GITHUB_STEP_SUMMARY
+            echo "| Deployer | \`${{ steps.deploy.outputs.deployer_address }}\` |" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Next step:** set \`GENLAYER_CONTRACT_ADDRESS=${{ steps.deploy.outputs.contract_address }}\` in Vercel and your \`.env\`." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Deployment did not produce a contract address — check logs above." >> $GITHUB_STEP_SUMMARY
+          fi

@@ -71,7 +71,7 @@ export async function GET(req: NextRequest) {
     data:  {
       xUserId:         xUser.id,
       xUsername:       xUser.username,
-      xConnectedAt:    existing?.xConnectedAt ?? now, // preserve original connection time
+      xConnectedAt:    existing?.xConnectedAt ?? now,
       xAccessToken:    encrypt(tokens.accessToken),
       xRefreshToken:   encrypt(tokens.refreshToken),
       xTokenExpiresAt: tokens.expiresAt,

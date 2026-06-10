@@ -6,10 +6,10 @@ export interface SessionUser {
 }
 
 export interface UserProfile {
-  walletAddress: string
-  xUserId: string | null
-  xUsername: string | null
-  xConnectedAt: string | null
+  walletAddress:       string
+  xUserId:             string | null
+  xUsername:           string | null
+  xConnectedAt:        string | null
   marketsCreatedToday: number
   totalMarketsCreated: number
 }

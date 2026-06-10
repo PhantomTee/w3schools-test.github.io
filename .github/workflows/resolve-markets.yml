@@ -12,9 +12,21 @@ jobs:
     timeout-minutes: 5
 
     steps:
+      - name: Validate secrets
+        run: |
+          if [ -z "${{ secrets.APP_URL }}" ]; then
+            echo "ERROR: APP_URL secret is not set. Go to Settings → Secrets → Actions and add APP_URL (e.g. https://your-app.vercel.app)."
+            exit 1
+          fi
+          if [ -z "${{ secrets.CRON_SECRET }}" ]; then
+            echo "ERROR: CRON_SECRET secret is not set. Add it to Settings → Secrets → Actions."
+            exit 1
+          fi
+
       - name: Trigger market resolution
         run: |
           HTTP_STATUS=$(curl -s -o /tmp/response.json -w "%{http_code}" \
+            --max-time 60 \
             -X GET "${{ secrets.APP_URL }}/api/cron/resolve" \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             -H "Content-Type: application/json")

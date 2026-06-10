@@ -16,8 +16,8 @@ runs = 1000
 fuzz = { runs = 5000 }
 
 [rpc_endpoints]
-arc_testnet = "${ARC_RPC_URL}"
-localhost = "http://127.0.0.1:8545"
+arc_testnet = "${ARC_RPC_URL:-https://rpc.testnet.arc.network}"
+localhost   = "http://127.0.0.1:8545"
 
 [etherscan]
-arc_testnet = { key = "${ARC_EXPLORER_API_KEY}", url = "${ARC_EXPLORER_URL}" }
+arc_testnet = { key = "${ARC_EXPLORER_API_KEY}", url = "https://testnet.arcscan.app" }

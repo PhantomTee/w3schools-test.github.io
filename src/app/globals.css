@@ -2,71 +2,224 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  :root {
-    --background:              220 38% 4%;
-    --foreground:              210 40% 98%;
-    --card:                    218 55% 9%;
-    --card-foreground:         210 40% 98%;
-    --popover:                 218 43% 10%;
-    --popover-foreground:      210 40% 98%;
-    --primary:                 221 83% 54%;
-    --primary-foreground:      0 0% 100%;
-    --secondary:               218 35% 14%;
-    --secondary-foreground:    215 19% 65%;
-    --muted:                   218 43% 11%;
-    --muted-foreground:        215 16% 47%;
-    --accent:                  218 35% 14%;
-    --accent-foreground:       210 40% 98%;
-    --destructive:             0 84% 60%;
-    --destructive-foreground:  0 0% 100%;
-    --border:                  218 25% 14%;
-    --input:                   218 43% 11%;
-    --ring:                    221 83% 54%;
-    --radius:                  0.75rem;
-  }
+/* ─── Shadcn HSL tokens ──────────────────────────────────────────────────── */
+:root {
+  --background:              40 35% 91%;
+  --foreground:              25 60% 12%;
+  --card:                    40 30% 96%;
+  --card-foreground:         25 60% 12%;
+  --popover:                 40 30% 96%;
+  --popover-foreground:      25 60% 12%;
+  --primary:                 201 90% 35%;
+  --primary-foreground:      40 35% 96%;
+  --secondary:               35 25% 84%;
+  --secondary-foreground:    25 50% 18%;
+  --muted:                   35 20% 82%;
+  --muted-foreground:        25 30% 40%;
+  --accent:                  35 20% 82%;
+  --accent-foreground:       25 60% 12%;
+  --destructive:             0 72% 45%;
+  --destructive-foreground:  0 0% 100%;
+  --border:                  30 25% 72%;
+  --input:                   35 20% 82%;
+  --ring:                    201 90% 35%;
+  --radius:                  0.375rem;
+
+  /* ── Xen design tokens — light (parchment) ── */
+  --bg-base:        #F5EDD8;
+  --bg-secondary:   #EDE4C8;
+  --bg-card:        #FDFAF2;
+  --bg-elevated:    #F0E8D0;
+  --bg-panel:       #EBE0C8;
+  --bg-muted:       #E0D4B8;
+  --bg-navy:        #1E130A;
+
+  --accent-primary: #0369A1;
+  --accent-bright:  #0284C7;
+  --accent-deep:    #075985;
+  --accent-text:    #FDFAF2;
+  --accent-glow:    rgba(3,105,161,0.15);
+  --accent-pale:    #E0F2FE;
+
+  --text-primary:   #1E130A;
+  --text-secondary: #4A3020;
+  --text-muted:     #7A5A40;
+
+  --border-soft:    rgba(74,48,32,0.15);
+  --border-strong:  rgba(74,48,32,0.30);
+  --border-active:  #0369A1;
+
+  --xen-red:        #B91C1C;
+  --xen-green:      #15803D;
+  --xen-amber:      #92400E;
+
+  /* hand-drawn offsets for uneven borders */
+  --sketch-r: 2px 7px 4px 6px / 5px 3px 7px 4px;
 }
 
+/* ─── Dark theme ─────────────────────────────────────────────────────────── */
+.dark {
+  --background:              25 15% 8%;
+  --foreground:              40 20% 92%;
+  --card:                    25 12% 11%;
+  --card-foreground:         40 20% 92%;
+  --popover:                 25 12% 10%;
+  --popover-foreground:      40 20% 92%;
+  --primary:                 199 92% 60%;
+  --primary-foreground:      0 0% 4%;
+  --secondary:               25 10% 18%;
+  --secondary-foreground:    40 15% 65%;
+  --muted:                   25 10% 18%;
+  --muted-foreground:        40 10% 48%;
+  --accent:                  25 10% 18%;
+  --accent-foreground:       40 20% 92%;
+  --destructive:             0 72% 71%;
+  --destructive-foreground:  0 0% 100%;
+  --border:                  25 10% 20%;
+  --input:                   25 10% 18%;
+  --ring:                    199 92% 60%;
+
+  --bg-base:        #1C1714;
+  --bg-secondary:   #221D18;
+  --bg-card:        #2A2320;
+  --bg-elevated:    #302820;
+  --bg-panel:       #282018;
+  --bg-muted:       #383028;
+  --bg-navy:        #1C1714;
+
+  --accent-primary: #38BDF8;
+  --accent-bright:  #7DD3FC;
+  --accent-deep:    #0EA5E9;
+  --accent-text:    #0A0A0A;
+  --accent-glow:    rgba(56,189,248,0.20);
+  --accent-pale:    #E0F2FE;
+
+  --text-primary:   #F0E8D8;
+  --text-secondary: #C4A882;
+  --text-muted:     #8A7560;
+
+  --border-soft:    rgba(255,235,200,0.08);
+  --border-strong:  rgba(255,235,200,0.16);
+  --border-active:  #38BDF8;
+
+  --xen-red:        #F87171;
+  --xen-green:      #4ADE80;
+  --xen-amber:      #FBBF24;
+
+  --sketch-r: 2px 7px 4px 6px / 5px 3px 7px 4px;
+}
+
+/* ─── Base styles ────────────────────────────────────────────────────────── */
 @layer base {
   * { @apply border-border; }
+
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
   body {
-    background-color: #05070B;
-    color: #F8FAFC;
+    background-color: var(--bg-base);
+    color: var(--text-primary);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-feature-settings: "rlig" 1, "calt" 1;
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
-  h1, h2, h3, h4, h5, h6 {
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display), 'Caveat', cursive;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  h5, h6 {
+    font-family: var(--font-display), 'Caveat', cursive;
     font-weight: 600;
-    letter-spacing: -0.015em;
+  }
+
+  p, span, a, button, input, label, li {
+    font-family: var(--font-display), 'Caveat', cursive;
   }
 }
 
+/* ─── Utility classes ────────────────────────────────────────────────────── */
 @layer utilities {
-  .glow-blue-xs  { box-shadow: 0 0 20px rgba(59,130,246,0.08); }
-  .glow-blue-sm  { box-shadow: 0 0 30px rgba(59,130,246,0.12); }
-  .glow-blue     { box-shadow: 0 0 40px rgba(59,130,246,0.18); }
-  .glow-blue-lg  { box-shadow: 0 0 60px rgba(59,130,246,0.28); }
+  /* Glow */
+  .glow-xs { box-shadow: 0 0 16px var(--accent-glow); }
+  .glow-sm { box-shadow: 0 0 28px var(--accent-glow); }
+  .glow    { box-shadow: 0 0 40px var(--accent-glow); }
+  .glow-lg { box-shadow: 0 0 60px var(--accent-glow); }
 
-  .border-glow-blue {
-    border-color: rgba(59,130,246,0.45) !important;
-    box-shadow: 0 0 0 1px rgba(59,130,246,0.12), 0 0 24px rgba(59,130,246,0.08);
+  /* aliases */
+  .glow-yellow-xs, .glow-green-xs { box-shadow: 0 0 16px var(--accent-glow); }
+  .glow-yellow-sm, .glow-green-sm { box-shadow: 0 0 28px var(--accent-glow); }
+  .glow-yellow,    .glow-green    { box-shadow: 0 0 40px var(--accent-glow); }
+  .glow-yellow-lg, .glow-green-lg { box-shadow: 0 0 60px var(--accent-glow); }
+
+  .border-glow-green {
+    border-color: var(--border-active) !important;
+    box-shadow: 2px 2px 0 var(--border-active);
   }
 
+  /* paper texture overlay */
+  .paper-texture {
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  }
+
+  /* sketchy border radius helper */
+  .sketchy { border-radius: var(--sketch-r); }
+
+  /* sketch card — drawn box style used on cards/panels */
+  .sketch-card {
+    background: var(--bg-card);
+    border: 2px solid var(--text-primary);
+    box-shadow: 3px 3px 0 var(--text-primary);
+    border-radius: 3px;
+    filter: url(#hand-draw);
+  }
+
+  .sketch-panel {
+    background: var(--bg-elevated);
+    border: 2px solid var(--border-strong);
+    box-shadow: 2px 2px 0 var(--border-strong);
+    border-radius: 3px;
+    filter: url(#hand-draw);
+  }
+
+  /* font-display override — Caveat everywhere */
+  .font-display { font-family: var(--font-display), 'Caveat', cursive; }
+
+  /* Shimmer */
   .shimmer {
-    background: linear-gradient(90deg, #0B1220 25%, #101827 50%, #0B1220 75%);
+    background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-elevated) 50%, var(--bg-card) 75%);
     background-size: 200% 100%;
     animation: shimmer 1.6s infinite;
   }
 
-  .animate-fade-in { animation: fade-in 0.25s ease-out; }
+  /* Animation helpers */
+  .animate-fade-in    { animation: fade-in 0.25s ease-out; }
+  .animate-sheet-up   { animation: sheet-slide-up 0.32s cubic-bezier(0.32,0.72,0,1); }
+  .animate-card-enter { animation: card-stack-enter 0.3s ease-out; }
+  .animate-card-exit  { animation: card-exit-up 0.35s cubic-bezier(0.4,0,0.2,1) forwards; }
 
-  .bg-page {
-    background:
-      radial-gradient(ellipse 80% 30% at 50% -5%, rgba(37,99,235,0.06) 0%, transparent 70%),
-      #05070B;
+  /* Page background */
+  .bg-page { background-color: var(--bg-base); }
+
+  /* Text */
+  .text-balance  { text-wrap: balance; }
+  .tabular-nums  { font-variant-numeric: tabular-nums; }
+  .font-display  { font-family: var(--font-display), 'Anton', sans-serif; }
+
+  /* Scrollbar */
+  .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  .hide-scrollbar::-webkit-scrollbar { display: none; }
+
+  /* Progress */
+  .progress-yellow {
+    background: var(--accent-primary);
   }
-
-  .text-balance    { text-wrap: balance; }
-  .tabular-nums    { font-variant-numeric: tabular-nums; }
+  .progress-green {
+    background: var(--accent-primary);
+  }
 }

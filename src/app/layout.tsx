@@ -1,12 +1,13 @@
 import type { Metadata } from 'next'
-import { Urbanist } from 'next/font/google'
+import { Caveat } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
+import { SketchFilter } from '@/components/ui/sketch-filter'
 
-const urbanist = Urbanist({
+const caveat = Caveat({
   subsets:  ['latin'],
-  variable: '--font-sans',
-  weight:   ['400', '500', '600', '700'],
+  variable: '--font-display',
+  weight:   ['400', '600', '700'],
   display:  'swap',
 })
 
@@ -28,8 +29,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
-      <body className={`${urbanist.variable} font-sans min-h-screen bg-[#05070B] text-[#F8FAFC]`}>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${caveat.variable} font-display min-h-screen`}>
+        <SketchFilter />
         <Providers>{children}</Providers>
       </body>
     </html>
