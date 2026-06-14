@@ -43,21 +43,25 @@ function mapTweet(raw: any): Tweet {
 }
 
 export async function getUserInfoById(userId: string): Promise<TAIOUser> {
+  // Batch endpoint accepts a single ID too — cheapest per-call option for lookups.
   const res = await fetch(
-    `${BASE}/twitter/user/info?userId=${encodeURIComponent(userId)}`,
+    `${BASE}/twitter/user/batch_info_by_ids?userIds=${encodeURIComponent(userId)}`,
     { headers: reqHeaders() }
   )
   if (!res.ok) {
     const err = await res.text()
-    throw new Error(`TwitterAPI.io /user/info failed: ${res.status} ${err}`)
+    throw new Error(`TwitterAPI.io /user/batch_info_by_ids failed: ${res.status} ${err}`)
   }
-  const d = await res.json()
+  const data = await res.json()
+  // Response: { users: [{ id, userName, name, profilePicture, followers, ... }] }
+  const d = (data.users ?? data)[0]
+  if (!d) throw new Error('TwitterAPI.io: no user found for id ' + userId)
   return {
-    id:        String(d.id ?? d.userId ?? userId),
-    username:  d.userName ?? d.username ?? '',
+    id:        String(d.id ?? userId),
+    username:  d.userName ?? '',
     name:      d.name ?? '',
-    followers: d.followers ?? d.followersCount,
-    avatarUrl: d.profilePicture ?? d.profile_image_url,
+    followers: d.followers,
+    avatarUrl: d.profilePicture,
   }
 }
 
@@ -84,17 +88,19 @@ export async function getUserTweets(
 }
 
 export async function getTweetById(tweetId: string): Promise<Tweet | null> {
+  // Bulk tweets endpoint accepts a single ID too.
   const res = await fetch(
-    `${BASE}/twitter/tweet/detail?tweet_id=${encodeURIComponent(tweetId)}`,
+    `${BASE}/twitter/tweets?tweet_ids=${encodeURIComponent(tweetId)}`,
     { headers: reqHeaders() }
   )
   if (res.status === 404) return null
   if (!res.ok) {
     const err = await res.text()
-    throw new Error(`TwitterAPI.io /tweet/detail failed: ${res.status} ${err}`)
+    throw new Error(`TwitterAPI.io /tweets failed: ${res.status} ${err}`)
   }
   const data = await res.json()
-  const raw  = data.tweet ?? data
-  if (!raw?.id && !raw?.tweet_id) return null
-  return mapTweet(raw)
+  // Response: { tweets: [...] } or array directly
+  const tweets = data.tweets ?? (Array.isArray(data) ? data : [])
+  if (!tweets.length) return null
+  return mapTweet(tweets[0])
 }
