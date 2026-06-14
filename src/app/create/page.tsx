@@ -13,12 +13,12 @@ type Step = 1 | 2 | 3 | 4 | 5
 
 interface Tweet {
   id:               string
-  tweetId:          string
   text:             string
-  normalizedMetrics: { views: number; likes: number; reposts: number; replies: number }
+  created_at:       string
+  normalizedMetrics: { views: number | null; likes: number; reposts: number; replies: number }
   eligible:         boolean
-  eligibilityNote?: string
-  createdAtOnX:     string
+  eligibilityNote?: string | null
+  activeMarketCount: number
 }
 
 const METRICS: { key: MetricType; label: string; metricKey: keyof Tweet['normalizedMetrics'] }[] = [
@@ -59,7 +59,7 @@ export default function CreatePage() {
   })
   const me = meData?.user
 
-  const { data: tweetsData, isLoading: tweetsLoading } = useQuery<{ tweets: Tweet[] }>({
+  const { data: tweetsData, isLoading: tweetsLoading, isError: tweetsError, error: tweetsErrorObj } = useQuery<{ tweets: Tweet[]; error?: string }>({
     queryKey: ['tweets'],
     queryFn:  () => fetch('/api/tweets').then(r => r.json()),
     enabled:  !!me?.xUsername && isConnected,
@@ -77,7 +77,7 @@ export default function CreatePage() {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({
-          tweetId:      selectedTweet.tweetId,
+          tweetId:      selectedTweet.id,
           metricType:   selectedMetric,
           durationHours: selectedDuration,
           startValue,
@@ -122,7 +122,7 @@ export default function CreatePage() {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({
-          tweetId:       selectedTweet.tweetId,
+          tweetId:       selectedTweet.id,
           metricType:    selectedMetric,
           durationHours: selectedDuration,
           walletAddress: address,
@@ -208,7 +208,7 @@ export default function CreatePage() {
                     )}>
                       <p className="text-[var(--text-muted)]">{m.label.replace('Final ', '')}</p>
                       <p className="text-[var(--text-primary)] font-semibold tabular-nums">
-                        {formatMetric(selectedTweet.normalizedMetrics[m.metricKey])}
+                        {formatMetric(selectedTweet.normalizedMetrics[m.metricKey] ?? 0)}
                       </p>
                     </div>
                   ))}
@@ -263,7 +263,24 @@ export default function CreatePage() {
                 </div>
               )}
 
-              {tweetsData?.tweets && (
+              {(tweetsError || tweetsData?.error) && (
+                <div className="bg-red-500/10 border border-red-500/30 rounded-[14px] p-4 mb-3">
+                  <p className="text-[12px] text-red-400 font-medium mb-1">Failed to load tweets</p>
+                  <p className="text-[11px] text-[var(--text-muted)]">
+                    {tweetsData?.error ?? (tweetsErrorObj as Error)?.message ?? 'Unknown error'}
+                  </p>
+                </div>
+              )}
+
+              {tweetsData?.tweets && tweetsData.tweets.length === 0 && (
+                <div className="bg-[var(--bg-elevated)] border border-[var(--border-soft)] rounded-[14px] p-4">
+                  <p className="text-[13px] text-[var(--text-muted)]">
+                    No tweets found. Post on X after connecting your account — only tweets posted after connecting are eligible.
+                  </p>
+                </div>
+              )}
+
+              {tweetsData?.tweets && tweetsData.tweets.length > 0 && (
                 <div className="space-y-2 max-h-[320px] overflow-y-auto hide-scrollbar">
                   {tweetsData.tweets.map(tweet => (
                     <button
@@ -283,7 +300,7 @@ export default function CreatePage() {
                         </Badge>
                       </div>
                       <div className="flex gap-3 text-[10px] text-[var(--text-muted)] tabular-nums">
-                        <span>{formatMetric(tweet.normalizedMetrics.views)} views</span>
+                        <span>{formatMetric(tweet.normalizedMetrics.views ?? 0)} views</span>
                         <span>{formatMetric(tweet.normalizedMetrics.likes)} likes</span>
                         <span>{formatMetric(tweet.normalizedMetrics.reposts)} reposts</span>
                       </div>
@@ -314,7 +331,7 @@ export default function CreatePage() {
                       <p className="text-[13px] font-medium text-[var(--text-primary)] mb-0.5">{m.label}</p>
                       {selectedTweet && (
                         <p className="text-[11px] text-[var(--text-muted)] tabular-nums">
-                          {formatMetric(selectedTweet.normalizedMetrics[m.metricKey])} now
+                          {formatMetric(selectedTweet.normalizedMetrics[m.metricKey] ?? 0)} now
                         </p>
                       )}
                     </button>

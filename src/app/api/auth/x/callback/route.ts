@@ -1,11 +1,18 @@
 /**
  * X OAuth 2.0 callback handler.
  * GET /api/auth/x/callback?code=...&state=...
+ *
+ * Identity strategy (no official X API calls needed):
+ *   1. Token exchange returns an OIDC id_token (openid scope).
+ *   2. Decode id_token JWT → sub = X user ID.
+ *   3. Call TwitterAPI.io to get username from user ID.
+ * This avoids the /2/users/me call that requires being in an X Project.
  */
 import { NextRequest, NextResponse } from 'next/server'
 import { getSession } from '@/lib/session'
 import { prisma } from '@/lib/prisma'
-import { exchangeCodeForTokens, getUserByMe } from '@/lib/x-api'
+import { exchangeCodeForTokens, decodeIdToken } from '@/lib/x-api'
+import { getUserInfoById } from '@/lib/twitterapiio'
 import { encrypt } from '@/lib/crypto'
 
 export async function GET(req: NextRequest) {
@@ -24,17 +31,14 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(`${appUrl}/profile?error=x_invalid_callback`)
   }
 
-  // Look up the OAuth record from DB first — more reliable than the session
-  // cookie which can be dropped by Safari / strict browser settings during
-  // a cross-site redirect to x.com and back.
+  // DB record is more reliable than session cookie (Safari can drop cookies
+  // across a cross-site redirect to x.com and back).
   const oauthRecord = await prisma.xOAuthState.findUnique({ where: { state } })
   if (!oauthRecord || oauthRecord.expiresAt < new Date()) {
     return NextResponse.redirect(`${appUrl}/profile?error=x_state_expired`)
   }
 
-  // Resolve the wallet address: prefer session (still valid in most browsers),
-  // fall back to the value stored in the DB record when the session was created.
-  const session = await getSession()
+  const session       = await getSession()
   const walletAddress = session.user?.walletAddress ?? oauthRecord.walletAddress
 
   if (!walletAddress) {
@@ -51,16 +55,25 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(`${appUrl}/profile?error=x_token_exchange_failed`)
   }
 
-  let xUser
+  // Extract X user ID from the OIDC id_token (no API call required).
+  const xUserId = tokens.idToken ? decodeIdToken(tokens.idToken) : null
+  if (!xUserId) {
+    const detail = encodeURIComponent('id_token missing — ensure openid scope is granted and the app is configured correctly.')
+    return NextResponse.redirect(`${appUrl}/profile?error=x_userinfo_failed&detail=${detail}`)
+  }
+
+  // Resolve username via TwitterAPI.io (does not require X Project access).
+  let xUser: { id: string; username: string; avatarUrl?: string; followers?: number }
   try {
-    xUser = await getUserByMe(tokens.accessToken)
+    const info = await getUserInfoById(xUserId)
+    xUser = { id: xUserId, username: info.username, avatarUrl: info.avatarUrl, followers: info.followers }
   } catch (e) {
-    console.error('X /users/me error:', e)
+    console.error('TwitterAPI.io user info error:', e)
     const detail = encodeURIComponent((e as Error).message.slice(0, 160))
     return NextResponse.redirect(`${appUrl}/profile?error=x_userinfo_failed&detail=${detail}`)
   }
 
-  // Ensure this X account isn't already linked to a different wallet
+  // Ensure this X account isn't already linked to a different wallet.
   const existing = await prisma.user.findUnique({ where: { xUserId: xUser.id } })
   if (existing && existing.walletAddress !== walletAddress) {
     return NextResponse.redirect(`${appUrl}/profile?error=x_already_connected`)
@@ -76,8 +89,8 @@ export async function GET(req: NextRequest) {
       xAccessToken:    encrypt(tokens.accessToken),
       xRefreshToken:   encrypt(tokens.refreshToken),
       xTokenExpiresAt: tokens.expiresAt,
-      xAvatarUrl:      xUser.avatarUrl    ?? null,
-      xFollowerCount:  xUser.followerCount ?? null,
+      xAvatarUrl:      xUser.avatarUrl ?? null,
+      xFollowerCount:  xUser.followers ?? null,
     },
   })
 

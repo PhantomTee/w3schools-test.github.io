@@ -37,7 +37,7 @@ export function getOAuthUrl(state: string, codeChallenge: string): string {
     response_type:         'code',
     client_id:             CLIENT_ID,
     redirect_uri:          CALLBACK_URL,
-    scope:                 'tweet.read tweet.write users.read offline.access',
+    scope:                 'tweet.read tweet.write users.read offline.access openid',
     state,
     code_challenge:        codeChallenge,
     code_challenge_method: 'S256',
@@ -51,6 +51,19 @@ export interface XTokens {
   accessToken:  string
   refreshToken: string
   expiresAt:    Date
+  idToken?:     string  // OIDC id_token — present when openid scope granted
+}
+
+// Decode the OIDC id_token (a JWT) to extract the X user ID from the `sub` claim.
+// Does not verify the signature — we trust X issued it in the same HTTP response.
+export function decodeIdToken(idToken: string): string | null {
+  try {
+    const [, payload] = idToken.split('.')
+    const decoded = JSON.parse(Buffer.from(payload, 'base64url').toString())
+    return decoded.sub ? String(decoded.sub) : null
+  } catch {
+    return null
+  }
 }
 
 export async function exchangeCodeForTokens(code: string, codeVerifier: string): Promise<XTokens> {
@@ -81,6 +94,7 @@ export async function exchangeCodeForTokens(code: string, codeVerifier: string):
     accessToken:  data.access_token,
     refreshToken: data.refresh_token,
     expiresAt:    new Date(Date.now() + data.expires_in * 1000),
+    idToken:      data.id_token,
   }
 }
 
